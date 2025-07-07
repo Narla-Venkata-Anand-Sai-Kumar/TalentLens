@@ -2,7 +2,9 @@
 
 **Professional AI-Powered Interview Training Platform**
 
-A comprehensive, market-ready interview training system that leverages AI to provide personalized interview experienc# Access PostgreSQL
+A comprehensive, market-ready interview training system that leverages AI to provide personalized interview experience
+
+# Access PostgreSQL
 docker-compose exec postgres psql -U postgres -d talentlens_dev
 
 # Backup database
