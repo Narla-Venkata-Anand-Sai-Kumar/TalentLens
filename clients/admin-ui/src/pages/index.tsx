@@ -35,7 +35,7 @@ const AdminHomePage: React.FC = () => {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-purple-600">
-                Nero Admin Portal
+                TalentLens Admin Portal
               </h1>
             </div>
             <div className="flex items-center space-x-4">

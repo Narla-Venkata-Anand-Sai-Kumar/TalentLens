@@ -309,7 +309,7 @@ const EnhancedRegisterPage: React.FC = () => {
         <Card className="bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200">
           <Card.Content className="px-6 py-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-              Why choose Nero Skill Trainer?
+              Why choose TalentLens?
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">

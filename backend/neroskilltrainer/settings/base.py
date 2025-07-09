@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'neroskilltrainer.wsgi.application'
 ASGI_APPLICATION = 'neroskilltrainer.asgi.application'
 
 # Database
-DATABASE_URL = config('DATABASE_URL', default='postgresql://postgres:password@localhost:5432/neroskilltrainer')
+DATABASE_URL = config('DATABASE_URL', default='postgresql://postgres:password@localhost:5432/talentlens')
 DATABASES = {
     'default': dj_database_url.parse(DATABASE_URL)
 }
@@ -144,14 +144,12 @@ SIMPLE_JWT = {
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",    # Original frontend
+    "http://localhost:3000",    # Student UI
     "http://127.0.0.1:3000",
-    "http://localhost:3001",    # Student UI
+    "http://localhost:3001",    # Teacher UI
     "http://127.0.0.1:3001",
-    "http://localhost:3002",    # Teacher UI
+    "http://localhost:3002",    # Admin UI
     "http://127.0.0.1:3002",
-    "http://localhost:3003",    # Admin UI
-    "http://127.0.0.1:3003",
 ]
 
 CORS_ALLOW_CREDENTIALS = True

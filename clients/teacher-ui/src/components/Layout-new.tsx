@@ -257,7 +257,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
         <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
           <div className="flex items-center flex-shrink-0 px-4">
             <h2 className="text-xl font-bold text-emerald-600">
-              Nero Skill Trainer
+              TalentLens
             </h2>
           </div>
           
@@ -325,7 +325,7 @@ function getPageTitle(pathname: string): string {
     '/profile': 'Profile',
   };
 
-  return titles[pathname] || 'Nero Skill Trainer';
+  return titles[pathname] || 'TalentLens';
 }
 
 export default Layout;

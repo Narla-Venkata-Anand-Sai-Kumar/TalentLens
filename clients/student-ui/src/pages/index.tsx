@@ -37,7 +37,7 @@ const StudentHomePage: React.FC = () => {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-blue-600">
-                Nero Student Portal
+                TalentLens Student Portal
               </h1>
             </div>
             <div className="flex items-center space-x-4">

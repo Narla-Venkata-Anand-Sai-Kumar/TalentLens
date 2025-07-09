@@ -207,15 +207,15 @@ const LoginPage: React.FC = () => {
           <CardContent className="space-y-2">
             <div className="text-xs text-gray-600">
               <p className="font-medium">Administrator:</p>
-              <p>admin@neroskilltrainer.com / admin123</p>
+              <p>admin@talentlens.com / admin123</p>
             </div>
             <div className="text-xs text-gray-600">
               <p className="font-medium">Teacher:</p>
-              <p>teacher@neroskilltrainer.com / teacher123</p>
+              <p>teacher@talentlens.com / teacher123</p>
             </div>
             <div className="text-xs text-gray-600">
               <p className="font-medium">Student:</p>
-              <p>student@neroskilltrainer.com / student123</p>
+              <p>student@talentlens.com / student123</p>
             </div>
           </CardContent>
         </Card>

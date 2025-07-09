@@ -67,7 +67,7 @@ const EnhancedLoginPage: React.FC = () => {
             </svg>
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Welcome to Nero Skill Trainer
+            Welcome to TalentLens
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Sign in to your account to continue your interview preparation journey
@@ -202,7 +202,7 @@ const EnhancedLoginPage: React.FC = () => {
         <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
           <Card.Content className="px-6 py-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-              What you'll get with Nero Skill Trainer
+              What you'll get with TalentLens
             </h4>
             <div className="space-y-3">
               <div className="flex items-start">

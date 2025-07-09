@@ -9,6 +9,7 @@
     "dev:student": "cd clients/student-ui && npm run dev",
     "dev:teacher": "cd clients/teacher-ui && npm run dev",
     "dev:admin": "cd clients/admin-ui && npm run dev",
+    "dev:all": "concurrently \"npm run dev:student\" \"npm run dev:teacher\" \"npm run dev:admin\"",
     "build:all": "npm run build:student && npm run build:teacher && npm run build:admin",
     "build:student": "cd clients/student-ui && npm run build",
     "build:teacher": "cd clients/teacher-ui && npm run build",
@@ -22,7 +23,14 @@
     "test:all": "npm run test:student && npm run test:teacher && npm run test:admin",
     "test:student": "cd clients/student-ui && npm run test",
     "test:teacher": "cd clients/teacher-ui && npm run test",
-    "test:admin": "cd clients/admin-ui && npm run test"
+    "test:admin": "cd clients/admin-ui && npm run test",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build",
+    "docker:logs": "docker-compose logs -f",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:dev:logs": "docker-compose -f docker-compose.dev.yml logs -f"
   },
   "keywords": [
     "interview",
@@ -38,5 +46,8 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

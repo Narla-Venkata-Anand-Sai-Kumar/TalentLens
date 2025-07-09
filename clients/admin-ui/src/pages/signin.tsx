@@ -65,7 +65,7 @@ const AdminSignInPage: React.FC = () => {
         addToast({
           type: 'success',
           title: 'Login Successful',
-          description: 'Welcome back to Nero Admin Portal!',
+          description: 'Welcome back to TalentLens Admin Portal!',
         });
         router.push('/dashboard');
       } else {

@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:13
-    container_name: talentlens_postgres
+    container_name: talentlens_postgres_dev
     environment:
       POSTGRES_DB: talentlens_dev
       POSTGRES_USER: postgres
@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -18,11 +18,11 @@ services:
 
   redis:
     image: redis:6-alpine
-    container_name: talentlens_redis
+    container_name: talentlens_redis_dev
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - redis_data_dev:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -33,11 +33,11 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: talentlens_backend
+    container_name: talentlens_backend_dev
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
-      - media_volume:/app/media
+      - media_volume_dev:/app/media
     ports:
       - "8000:8000"
     env_file:
@@ -53,6 +53,6 @@ services:
         condition: service_healthy
 
 volumes:
-  postgres_data:
-  redis_data:
-  media_volume:
+  postgres_data_dev:
+  redis_data_dev:
+  media_volume_dev:

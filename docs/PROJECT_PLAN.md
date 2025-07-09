@@ -1,6 +1,7 @@
 volumes:
-  postgres_data:
-```
+postgres_data:
+
+````
 
 ### 4.2 Backend Dockerfile
 
@@ -28,7 +29,7 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "talentlens.wsgi:application"]
-```
+````
 
 ### 4.3 Frontend Dockerfile
 
@@ -60,6 +61,7 @@ CMD ["npm", "start"]
 ### 5.1 Dashboard Analytics
 
 #### Performance Analytics Service
+
 ```python
 # apps/dashboard/services.py
 from django.db.models import Avg, Count, Q
@@ -72,10 +74,10 @@ class AnalyticsService:
     @staticmethod
     def get_student_performance_summary(student_id):
         sessions = InterviewSession.objects.filter(
-            student_id=student_id, 
+            student_id=student_id,
             status='completed'
         )
-        
+
         total_sessions = sessions.count()
         if total_sessions == 0:
             return {
@@ -86,40 +88,40 @@ class AnalyticsService:
                 'aptitude_avg': 0,
                 'improvement_trend': 0
             }
-        
+
         # Calculate averages by type
         technical_avg = sessions.filter(interview_type='technical').aggregate(
             avg_score=Avg('responses__score')
         )['avg_score'] or 0
-        
+
         communication_avg = sessions.filter(interview_type='communication').aggregate(
             avg_score=Avg('responses__score')
         )['avg_score'] or 0
-        
+
         aptitude_avg = sessions.filter(interview_type='aptitude').aggregate(
             avg_score=Avg('responses__score')
         )['avg_score'] or 0
-        
+
         overall_avg = sessions.aggregate(
             avg_score=Avg('responses__score')
         )['avg_score'] or 0
-        
+
         # Calculate improvement trend (last 5 sessions vs previous 5)
         recent_sessions = sessions.order_by('-created_at')[:5]
         previous_sessions = sessions.order_by('-created_at')[5:10]
-        
+
         recent_avg = sum([
-            resp.score for session in recent_sessions 
+            resp.score for session in recent_sessions
             for resp in session.responses.all()
         ]) / max(sum([session.responses.count() for session in recent_sessions]), 1)
-        
+
         previous_avg = sum([
-            resp.score for session in previous_sessions 
+            resp.score for session in previous_sessions
             for resp in session.responses.all()
         ]) / max(sum([session.responses.count() for session in previous_sessions]), 1)
-        
+
         improvement_trend = recent_avg - previous_avg
-        
+
         return {
             'total_sessions': total_sessions,
             'average_score': round(overall_avg, 2),
@@ -128,20 +130,20 @@ class AnalyticsService:
             'aptitude_avg': round(aptitude_avg, 2),
             'improvement_trend': round(improvement_trend, 2)
         }
-    
+
     @staticmethod
     def get_teacher_analytics(teacher_id):
         students = User.objects.filter(
             teachers__teacher_id=teacher_id,
             role='student'
         )
-        
+
         total_students = students.count()
         total_sessions = InterviewSession.objects.filter(
             teacher_id=teacher_id,
             status='completed'
         ).count()
-        
+
         # Student performance distribution
         performance_data = []
         for student in students:
@@ -151,24 +153,24 @@ class AnalyticsService:
                 'average_score': student_data['average_score'],
                 'total_sessions': student_data['total_sessions']
             })
-        
+
         # Calculate class average
         class_average = sum([data['average_score'] for data in performance_data]) / max(len(performance_data), 1)
-        
+
         return {
             'total_students': total_students,
             'total_sessions': total_sessions,
             'class_average': round(class_average, 2),
             'student_performance': performance_data
         }
-    
+
     @staticmethod
     def get_admin_analytics():
         total_users = User.objects.count()
         total_students = User.objects.filter(role='student').count()
         total_teachers = User.objects.filter(role='teacher').count()
         total_sessions = InterviewSession.objects.filter(status='completed').count()
-        
+
         # Monthly session trends
         thirty_days_ago = datetime.now() - timedelta(days=30)
         monthly_sessions = InterviewSession.objects.filter(
@@ -178,7 +180,7 @@ class AnalyticsService:
         ).values('month').annotate(
             count=Count('id')
         ).order_by('month')
-        
+
         # Performance by interview type
         performance_by_type = {}
         for interview_type in ['technical', 'communication', 'aptitude']:
@@ -188,9 +190,9 @@ class AnalyticsService:
             ).aggregate(
                 avg_score=Avg('responses__score')
             )['avg_score'] or 0
-            
+
             performance_by_type[interview_type] = round(avg_score, 2)
-        
+
         return {
             'total_users': total_users,
             'total_students': total_students,
@@ -204,9 +206,10 @@ class AnalyticsService:
 ### 5.2 Advanced Interview Features
 
 #### Interview Timer and Auto-submission
+
 ```typescript
 // components/student/InterviewTimer.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 interface InterviewTimerProps {
   duration: number; // in minutes
@@ -214,10 +217,10 @@ interface InterviewTimerProps {
   isActive: boolean;
 }
 
-const InterviewTimer: React.FC<InterviewTimerProps> = ({ 
-  duration, 
-  onTimeUp, 
-  isActive 
+const InterviewTimer: React.FC<InterviewTimerProps> = ({
+  duration,
+  onTimeUp,
+  isActive,
 }) => {
   const [timeLeft, setTimeLeft] = useState(duration * 60); // Convert to seconds
 
@@ -240,7 +243,9 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   const getProgressPercentage = () => {
@@ -248,9 +253,9 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
   };
 
   const getColorClass = () => {
-    if (timeLeft < 300) return 'text-red-600'; // Last 5 minutes
-    if (timeLeft < 600) return 'text-yellow-600'; // Last 10 minutes
-    return 'text-green-600';
+    if (timeLeft < 300) return "text-red-600"; // Last 5 minutes
+    if (timeLeft < 600) return "text-yellow-600"; // Last 10 minutes
+    return "text-green-600";
   };
 
   return (
@@ -261,10 +266,13 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
         </div>
         <div className="text-sm text-gray-500 mt-1">Time Remaining</div>
         <div className="w-32 bg-gray-200 rounded-full h-2 mt-2">
-          <div 
+          <div
             className={`h-2 rounded-full transition-all duration-1000 ${
-              timeLeft < 300 ? 'bg-red-500' : 
-              timeLeft < 600 ? 'bg-yellow-500' : 'bg-green-500'
+              timeLeft < 300
+                ? "bg-red-500"
+                : timeLeft < 600
+                ? "bg-yellow-500"
+                : "bg-green-500"
             }`}
             style={{ width: `${getProgressPercentage()}%` }}
           />
@@ -278,19 +286,20 @@ export default InterviewTimer;
 ```
 
 #### Enhanced Interview Session with Anti-cheating
+
 ```typescript
 // components/student/SecureInterviewSession.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import InterviewTimer from './InterviewTimer';
+import React, { useState, useEffect, useRef } from "react";
+import InterviewTimer from "./InterviewTimer";
 
 interface SecureInterviewSessionProps {
   sessionId: number;
   duration: number;
 }
 
-const SecureInterviewSession: React.FC<SecureInterviewSessionProps> = ({ 
-  sessionId, 
-  duration 
+const SecureInterviewSession: React.FC<SecureInterviewSessionProps> = ({
+  sessionId,
+  duration,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [tabSwitchCount, setTabSwitchCount] = useState(0);
@@ -305,7 +314,7 @@ const SecureInterviewSession: React.FC<SecureInterviewSessionProps> = ({
           await containerRef.current.requestFullscreen();
           setIsFullscreen(true);
         } catch (error) {
-          console.error('Failed to enter fullscreen:', error);
+          console.error("Failed to enter fullscreen:", error);
         }
       }
     };
@@ -315,9 +324,11 @@ const SecureInterviewSession: React.FC<SecureInterviewSessionProps> = ({
     // Detect tab switching
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        setTabSwitchCount(prev => prev + 1);
+        setTabSwitchCount((prev) => prev + 1);
         if (!warningShown) {
-          alert('Warning: Tab switching is being monitored. Multiple switches may result in session termination.');
+          alert(
+            "Warning: Tab switching is being monitored. Multiple switches may result in session termination."
+          );
           setWarningShown(true);
         }
       }
@@ -331,23 +342,25 @@ const SecureInterviewSession: React.FC<SecureInterviewSessionProps> = ({
     // Prevent common keyboard shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
       // Prevent F12, Ctrl+Shift+I, Ctrl+U, etc.
-      if (e.key === 'F12' || 
-          (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-          (e.ctrlKey && e.key === 'u') ||
-          (e.ctrlKey && e.shiftKey && e.key === 'C')) {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && e.key === "I") ||
+        (e.ctrlKey && e.key === "u") ||
+        (e.ctrlKey && e.shiftKey && e.key === "C")
+      ) {
         e.preventDefault();
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    document.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      document.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('keydown', handleKeyDown);
-      
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+
       // Exit fullscreen
       if (document.fullscreenElement) {
         document.exitFullscreen();
@@ -357,24 +370,22 @@ const SecureInterviewSession: React.FC<SecureInterviewSessionProps> = ({
 
   const handleTimeUp = () => {
     // Auto-submit the interview
-    alert('Time is up! Your interview will be submitted automatically.');
+    alert("Time is up! Your interview will be submitted automatically.");
     // Implement auto-submission logic here
   };
 
   return (
-    <div 
-      ref={containerRef}
-      className="min-h-screen bg-gray-100 p-4"
-    >
-      <InterviewTimer 
+    <div ref={containerRef} className="min-h-screen bg-gray-100 p-4">
+      <InterviewTimer
         duration={duration}
         onTimeUp={handleTimeUp}
         isActive={true}
       />
-      
+
       {tabSwitchCount > 0 && (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
-          Warning: {tabSwitchCount} tab switch(es) detected. This is being monitored.
+          Warning: {tabSwitchCount} tab switch(es) detected. This is being
+          monitored.
         </div>
       )}
 
@@ -392,6 +403,7 @@ export default SecureInterviewSession;
 ### 5.3 Resume Management System
 
 #### Resume Upload and Processing
+
 ```python
 # apps/resumes/views.py
 from rest_framework import viewsets, status
@@ -407,7 +419,7 @@ import io
 class ResumeViewSet(viewsets.ModelViewSet):
     serializer_class = ResumeSerializer
     parser_classes = (MultiPartParser, FormParser)
-    
+
     def get_queryset(self):
         user = self.request.user
         if user.role == 'administrator':
@@ -418,15 +430,15 @@ class ResumeViewSet(viewsets.ModelViewSet):
             )
         else:  # student
             return Resume.objects.filter(student=user)
-    
+
     @action(detail=False, methods=['post'])
     def upload_resume(self, request):
         student_id = request.data.get('student_id')
         resume_file = request.FILES.get('resume_file')
-        
+
         if not resume_file:
             return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         # Extract text from file
         try:
             if resume_file.name.endswith('.pdf'):
@@ -439,7 +451,7 @@ class ResumeViewSet(viewsets.ModelViewSet):
                 return Response({'error': 'Unsupported file format'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': f'Failed to process file: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         # Save or update resume
         resume, created = Resume.objects.update_or_create(
             student_id=student_id,
@@ -449,17 +461,17 @@ class ResumeViewSet(viewsets.ModelViewSet):
                 'is_active': True
             }
         )
-        
+
         serializer = self.get_serializer(resume)
         return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
-    
+
     def extract_pdf_text(self, file):
         reader = PyPDF2.PdfReader(io.BytesIO(file.read()))
         text = ""
         for page in reader.pages:
             text += page.extract_text()
         return text
-    
+
     def extract_docx_text(self, file):
         doc = docx.Document(io.BytesIO(file.read()))
         text = ""
@@ -471,6 +483,7 @@ class ResumeViewSet(viewsets.ModelViewSet):
 ### 5.4 Notification System
 
 #### Real-time Notifications
+
 ```python
 # apps/notifications/models.py
 from django.db import models
@@ -483,7 +496,7 @@ class Notification(models.Model):
         ('resume_uploaded', 'Resume Uploaded'),
         ('student_assigned', 'Student Assigned'),
     ]
-    
+
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_notifications', null=True)
     notification_type = models.CharField(max_length=30, choices=NOTIFICATION_TYPES)
@@ -491,7 +504,7 @@ class Notification(models.Model):
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ['-created_at']
 ```
@@ -512,7 +525,7 @@ class NotificationService:
             title=title,
             message=message
         )
-        
+
         # Send real-time notification
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
@@ -528,9 +541,9 @@ class NotificationService:
                 }
             }
         )
-        
+
         return notification
-    
+
     @staticmethod
     def notify_interview_scheduled(student, teacher, session):
         NotificationService.create_notification(
@@ -562,7 +575,7 @@ User = get_user_model()
 class InterviewTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        
+
         # Create users
         self.admin = User.objects.create_user(
             username='admin',
@@ -570,45 +583,45 @@ class InterviewTestCase(TestCase):
             password='testpass',
             role='administrator'
         )
-        
+
         self.teacher = User.objects.create_user(
             username='teacher',
             email='teacher@test.com',
             password='testpass',
             role='teacher'
         )
-        
+
         self.student = User.objects.create_user(
             username='student',
             email='student@test.com',
             password='testpass',
             role='student'
         )
-        
+
         # Create resume
         Resume.objects.create(
             student=self.student,
             content="Software Developer with 3 years experience in Python and Django",
             uploaded_by=self.teacher
         )
-    
+
     def test_interview_scheduling(self):
         self.client.force_authenticate(user=self.teacher)
-        
+
         data = {
             'student': self.student.id,
             'scheduled_datetime': (timezone.now() + timedelta(hours=1)).isoformat(),
             'end_datetime': (timezone.now() + timedelta(hours=2)).isoformat(),
             'interview_type': 'technical'
         }
-        
+
         response = self.client.post('/api/interviews/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
+
         session = InterviewSession.objects.get(id=response.data['id'])
         self.assertEqual(session.student, self.student)
         self.assertEqual(session.teacher, self.teacher)
-    
+
     def test_interview_access_control(self):
         # Create session
         session = InterviewSession.objects.create(
@@ -618,12 +631,12 @@ class InterviewTestCase(TestCase):
             end_datetime=timezone.now() + timedelta(minutes=30),
             interview_type='technical'
         )
-        
+
         # Test student access
         self.client.force_authenticate(user=self.student)
         response = self.client.post(f'/api/interviews/{session.id}/start_interview/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         # Test unauthorized access
         other_student = User.objects.create_user(
             username='other_student',
@@ -640,80 +653,87 @@ class InterviewTestCase(TestCase):
 
 ```typescript
 // __tests__/components/InterviewSession.test.tsx
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import InterviewSession from '../components/student/InterviewSession';
-import { AuthProvider } from '../context/AuthContext';
-import axios from 'axios';
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import InterviewSession from "../components/student/InterviewSession";
+import { AuthProvider } from "../context/AuthContext";
+import axios from "axios";
 
-jest.mock('axios');
+jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const renderWithAuth = (component: React.ReactElement) => {
-  return render(
-    <AuthProvider>
-      {component}
-    </AuthProvider>
-  );
+  return render(<AuthProvider>{component}</AuthProvider>);
 };
 
-describe('InterviewSession', () => {
+describe("InterviewSession", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('starts interview successfully', async () => {
+  test("starts interview successfully", async () => {
     mockedAxios.post.mockResolvedValueOnce({
       data: {
-        questions: ['What is your experience with Python?', 'Explain Django ORM']
-      }
+        questions: [
+          "What is your experience with Python?",
+          "Explain Django ORM",
+        ],
+      },
     });
 
     renderWithAuth(<InterviewSession sessionId={1} />);
 
-    const startButton = screen.getByText('Start Interview');
+    const startButton = screen.getByText("Start Interview");
     fireEvent.click(startButton);
 
     await waitFor(() => {
-      expect(screen.getByText('What is your experience with Python?')).toBeInTheDocument();
+      expect(
+        screen.getByText("What is your experience with Python?")
+      ).toBeInTheDocument();
     });
   });
 
-  test('submits answer and shows feedback', async () => {
+  test("submits answer and shows feedback", async () => {
     // Mock start interview
     mockedAxios.post.mockResolvedValueOnce({
       data: {
-        questions: ['What is your experience with Python?']
-      }
+        questions: ["What is your experience with Python?"],
+      },
     });
 
     // Mock submit answer
     mockedAxios.post.mockResolvedValueOnce({
       data: {
         score: 85,
-        feedback: 'Good understanding of Python concepts'
-      }
+        feedback: "Good understanding of Python concepts",
+      },
     });
 
     renderWithAuth(<InterviewSession sessionId={1} />);
 
     // Start interview
-    fireEvent.click(screen.getByText('Start Interview'));
+    fireEvent.click(screen.getByText("Start Interview"));
 
     await waitFor(() => {
-      expect(screen.getByText('What is your experience with Python?')).toBeInTheDocument();
+      expect(
+        screen.getByText("What is your experience with Python?")
+      ).toBeInTheDocument();
     });
 
     // Type answer
-    const textarea = screen.getByPlaceholderText('Type your answer here...');
-    fireEvent.change(textarea, { target: { value: 'I have 3 years of experience with Python' } });
+    const textarea = screen.getByPlaceholderText("Type your answer here...");
+    fireEvent.change(textarea, {
+      target: { value: "I have 3 years of experience with Python" },
+    });
 
     // Submit answer
-    fireEvent.click(screen.getByText('Submit Answer'));
+    fireEvent.click(screen.getByText("Submit Answer"));
 
     await waitFor(() => {
-      expect(screen.getByText('Score: 85/100')).toBeInTheDocument();
-      expect(screen.getByText('Good understanding of Python concepts')).toBeInTheDocument();
+      expect(screen.getByText("Score: 85/100")).toBeInTheDocument();
+      expect(
+        screen.getByText("Good understanding of Python concepts")
+      ).toBeInTheDocument();
     });
   });
 });
@@ -727,7 +747,7 @@ describe('InterviewSession', () => {
 # .env.production
 # Database
 DB_NAME=talentlens_prod
-DB_USER=neroskill_user
+DB_USER=talentlens_user
 DB_PASSWORD=your_secure_password
 DB_HOST=your_db_host
 DB_PORT=5432
@@ -760,7 +780,7 @@ SECURE_CONTENT_TYPE_NOSNIFF=True
 
 ```yaml
 # docker-compose.prod.yml
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -778,7 +798,7 @@ services:
     restart: unless-stopped
 
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile.prod
     command: gunicorn talentlens.wsgi:application --bind 0.0.0.0:8000 --workers 3
@@ -840,11 +860,11 @@ upstream frontend {
 server {
     listen 80;
     server_name yourdomain.com www.yourdomain.com;
-    
+
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
-    
+
     location / {
         return 301 https://$host$request_uri;
     }
@@ -853,17 +873,17 @@ server {
 server {
     listen 443 ssl;
     server_name yourdomain.com www.yourdomain.com;
-    
+
     ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
-    
+
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "no-referrer-when-downgrade" always;
     add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
-    
+
     # API requests
     location /api/ {
         proxy_pass http://backend;
@@ -872,7 +892,7 @@ server {
         proxy_redirect off;
         client_max_body_size 100M;
     }
-    
+
     # WebSocket connections
     location /ws/ {
         proxy_pass http://backend;
@@ -884,21 +904,21 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
-    
+
     # Static files
     location /static/ {
         alias /app/staticfiles/;
     }
-    
+
     location /media/ {
         alias /app/media/;
     }
-    
+
     # Frontend
     location / {
         proxy_pass http://frontend;
         proxy_set_header Host $host;
-        proxy_set_header X-Real-# NeroSkillTrainer - Complete Development Plan
+        proxy_set_header X-Real-# TalentLens - Complete Development Plan
 
 ## Tech Stack Overview
 - **Backend**: Django (Python) with Django REST Framework
@@ -911,40 +931,42 @@ server {
 ## Project Structure
 
 ```
-neroskilltrainer/
+
+talentlens/
 ├── backend/
-│   ├── neroskilltrainer/
-│   │   ├── settings/
-│   │   │   ├── base.py
-│   │   │   ├── development.py
-│   │   │   └── production.py
-│   │   ├── urls.py
-│   │   └── wsgi.py
-│   ├── apps/
-│   │   ├── authentication/
-│   │   ├── users/
-│   │   ├── interviews/
-│   │   ├── resumes/
-│   │   ├── dashboard/
-│   │   └── ai_engine/
-│   ├── requirements.txt
-│   └── manage.py
+│ ├── talentlens/
+│ │ ├── settings/
+│ │ │ ├── base.py
+│ │ │ ├── development.py
+│ │ │ └── production.py
+│ │ ├── urls.py
+│ │ └── wsgi.py
+│ ├── apps/
+│ │ ├── authentication/
+│ │ ├── users/
+│ │ ├── interviews/
+│ │ ├── resumes/
+│ │ ├── dashboard/
+│ │ └── ai_engine/
+│ ├── requirements.txt
+│ └── manage.py
 ├── frontend/
-│   ├── components/
-│   │   ├── common/
-│   │   ├── admin/
-│   │   ├── teacher/
-│   │   └── student/
-│   ├── pages/
-│   │   ├── admin/
-│   │   ├── teacher/
-│   │   └── student/
-│   ├── utils/
-│   ├── hooks/
-│   ├── context/
-│   └── styles/
+│ ├── components/
+│ │ ├── common/
+│ │ ├── admin/
+│ │ ├── teacher/
+│ │ └── student/
+│ ├── pages/
+│ │ ├── admin/
+│ │ ├── teacher/
+│ │ └── student/
+│ ├── utils/
+│ ├── hooks/
+│ ├── context/
+│ └── styles/
 └── docker-compose.yml
-```
+
+````
 
 ## Phase 1: Backend Development (Django)
 
@@ -1030,9 +1052,10 @@ CREATE TABLE performance_analytics (
     completion_time INTEGER, -- in minutes
     generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
+````
 
 #### Django Settings Configuration
+
 ```python
 # settings/base.py
 import os
@@ -1100,6 +1123,7 @@ GEMINI_MODEL = 'gemini-pro'
 ### 1.2 Django Models
 
 #### User Management Models
+
 ```python
 # apps/users/models.py
 from django.contrib.auth.models import AbstractUser
@@ -1111,11 +1135,11 @@ class User(AbstractUser):
         ('teacher', 'Teacher'),
         ('student', 'Student'),
     ]
-    
+
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     phone_number = models.CharField(max_length=15, blank=True)
     profile_picture = models.TextField(blank=True)  # Base64 encoded
-    
+
     def __str__(self):
         return f"{self.username} ({self.role})"
 
@@ -1123,12 +1147,13 @@ class TeacherStudentMapping(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='students')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teachers')
     assigned_date = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         unique_together = ('teacher', 'student')
 ```
 
 #### Resume Models
+
 ```python
 # apps/resumes/models.py
 from django.db import models
@@ -1140,12 +1165,13 @@ class Resume(models.Model):
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploaded_resumes')
     upload_date = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
-    
+
     def __str__(self):
         return f"Resume for {self.student.username}"
 ```
 
 #### Interview Models
+
 ```python
 # apps/interviews/models.py
 from django.db import models
@@ -1158,14 +1184,14 @@ class InterviewSession(models.Model):
         ('communication', 'Communication'),
         ('aptitude', 'Aptitude'),
     ]
-    
+
     STATUS_CHOICES = [
         ('scheduled', 'Scheduled'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
         ('missed', 'Missed'),
     ]
-    
+
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interview_sessions')
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='scheduled_sessions')
     scheduled_datetime = models.DateTimeField()
@@ -1173,11 +1199,11 @@ class InterviewSession(models.Model):
     interview_type = models.CharField(max_length=20, choices=INTERVIEW_TYPES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     def is_accessible(self):
         now = timezone.now()
         return self.scheduled_datetime <= now <= self.end_datetime
-    
+
     def __str__(self):
         return f"{self.interview_type} interview for {self.student.username}"
 
@@ -1186,7 +1212,7 @@ class InterviewQuestion(models.Model):
     question_text = models.TextField()
     question_order = models.IntegerField()
     generated_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ['question_order']
 
@@ -1201,6 +1227,7 @@ class InterviewResponse(models.Model):
 ### 1.3 Django Views & API Endpoints
 
 #### Authentication Views
+
 ```python
 # apps/authentication/views.py
 from rest_framework import status
@@ -1234,7 +1261,7 @@ def register(request):
 def login(request):
     username = request.data.get('username')
     password = request.data.get('password')
-    
+
     user = authenticate(username=username, password=password)
     if user:
         token, created = Token.objects.get_or_create(user=user)
@@ -1251,6 +1278,7 @@ def login(request):
 ```
 
 #### Interview Management Views
+
 ```python
 # apps/interviews/views.py
 from rest_framework import viewsets, status
@@ -1263,7 +1291,7 @@ from apps.ai_engine.services import GeminiService
 
 class InterviewSessionViewSet(viewsets.ModelViewSet):
     serializer_class = InterviewSessionSerializer
-    
+
     def get_queryset(self):
         user = self.request.user
         if user.role == 'administrator':
@@ -1272,26 +1300,26 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             return InterviewSession.objects.filter(teacher=user)
         else:  # student
             return InterviewSession.objects.filter(student=user)
-    
+
     @action(detail=True, methods=['post'])
     def start_interview(self, request, pk=None):
         session = self.get_object()
-        
+
         if not session.is_accessible():
-            return Response({'error': 'Interview not accessible at this time'}, 
+            return Response({'error': 'Interview not accessible at this time'},
                           status=status.HTTP_403_FORBIDDEN)
-        
+
         if session.status != 'scheduled':
-            return Response({'error': 'Interview already started or completed'}, 
+            return Response({'error': 'Interview already started or completed'},
                           status=status.HTTP_400_BAD_REQUEST)
-        
+
         # Generate questions using Gemini AI
         gemini_service = GeminiService()
         questions = gemini_service.generate_interview_questions(
             session.student.resume.content,
             session.interview_type
         )
-        
+
         # Save questions to database
         for i, question_text in enumerate(questions):
             InterviewQuestion.objects.create(
@@ -1299,33 +1327,33 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                 question_text=question_text,
                 question_order=i + 1
             )
-        
+
         session.status = 'in_progress'
         session.save()
-        
+
         return Response({'message': 'Interview started', 'questions': questions})
-    
+
     @action(detail=True, methods=['post'])
     def submit_answer(self, request, pk=None):
         session = self.get_object()
         question_id = request.data.get('question_id')
         answer_text = request.data.get('answer')
-        
+
         try:
             question = InterviewQuestion.objects.get(id=question_id, session=session)
         except InterviewQuestion.DoesNotExist:
             return Response({'error': 'Question not found'}, status=status.HTTP_404_NOT_FOUND)
-        
+
         # Get or create response
         response_obj, created = InterviewResponse.objects.get_or_create(
             question=question,
             defaults={'answer_text': answer_text}
         )
-        
+
         if not created:
             response_obj.answer_text = answer_text
             response_obj.save()
-        
+
         # Score using Gemini AI
         gemini_service = GeminiService()
         score, feedback = gemini_service.score_answer(
@@ -1333,11 +1361,11 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             answer_text,
             session.interview_type
         )
-        
+
         response_obj.score = score
         response_obj.ai_feedback = feedback
         response_obj.save()
-        
+
         return Response({
             'score': score,
             'feedback': feedback
@@ -1357,28 +1385,28 @@ class GeminiService:
     def __init__(self):
         genai.configure(api_key=settings.GEMINI_API_KEY)
         self.model = genai.GenerativeModel('gemini-pro')
-    
+
     def generate_interview_questions(self, resume_content, interview_type, num_questions=10):
         prompt = f"""
         Based on the following resume content, generate {num_questions} {interview_type} interview questions.
-        
+
         Resume Content:
         {resume_content}
-        
+
         Interview Type: {interview_type}
-        
+
         Requirements:
         - Questions should be relevant to the candidate's background
         - Difficulty should be appropriate for the experience level mentioned in resume
         - For technical: Focus on skills, technologies, and experience mentioned
         - For communication: Focus on behavioral and situational questions
         - For aptitude: Focus on logical reasoning, problem-solving, and analytical thinking
-        
+
         Return only the questions as a JSON array of strings.
         """
-        
+
         response = self.model.generate_content(prompt)
-        
+
         try:
             # Extract JSON from response
             json_match = re.search(r'\[.*\]', response.text, re.DOTALL)
@@ -1387,7 +1415,7 @@ class GeminiService:
                 return questions
         except:
             pass
-        
+
         # Fallback: parse line by line
         lines = response.text.strip().split('\n')
         questions = []
@@ -1399,32 +1427,32 @@ class GeminiService:
                 question = re.sub(r'["\']?$', '', question)
                 if question:
                     questions.append(question)
-        
+
         return questions[:num_questions]
-    
+
     def score_answer(self, question, answer, interview_type):
         prompt = f"""
         Evaluate the following interview answer and provide a score and feedback.
-        
+
         Question: {question}
         Answer: {answer}
         Interview Type: {interview_type}
-        
+
         Scoring Criteria:
         - Relevance to the question (0-25 points)
         - Technical accuracy (for technical questions) (0-25 points)
         - Clarity of communication (0-25 points)
         - Completeness of answer (0-25 points)
-        
+
         Provide your response in the following JSON format:
         {{
             "score": <integer from 0-100>,
             "feedback": "<detailed feedback explaining the score>"
         }}
         """
-        
+
         response = self.model.generate_content(prompt)
-        
+
         try:
             # Extract JSON from response
             json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
@@ -1433,7 +1461,7 @@ class GeminiService:
                 return result.get('score', 0), result.get('feedback', 'No feedback provided')
         except:
             pass
-        
+
         # Fallback scoring
         return 50, "Unable to generate detailed feedback. Please review manually."
 ```
@@ -1454,14 +1482,14 @@ npm install socket.io-client
 
 ```typescript
 // context/AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 
 interface User {
   id: number;
   username: string;
   email: string;
-  role: 'administrator' | 'teacher' | 'student';
+  role: "administrator" | "teacher" | "student";
 }
 
 interface AuthContextType {
@@ -1474,39 +1502,41 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    
+    const savedToken = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
     if (savedToken && savedUser) {
       setToken(savedToken);
       setUser(JSON.parse(savedUser));
-      axios.defaults.headers.common['Authorization'] = `Token ${savedToken}`;
+      axios.defaults.headers.common["Authorization"] = `Token ${savedToken}`;
     }
     setLoading(false);
   }, []);
 
   const login = async (username: string, password: string) => {
     try {
-      const response = await axios.post('/api/auth/login/', {
+      const response = await axios.post("/api/auth/login/", {
         username,
-        password
+        password,
       });
-      
+
       const { token: newToken, user: newUser } = response.data;
-      
+
       setToken(newToken);
       setUser(newUser);
-      
-      localStorage.setItem('token', newToken);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      
-      axios.defaults.headers.common['Authorization'] = `Token ${newToken}`;
+
+      localStorage.setItem("token", newToken);
+      localStorage.setItem("user", JSON.stringify(newUser));
+
+      axios.defaults.headers.common["Authorization"] = `Token ${newToken}`;
     } catch (error) {
       throw error;
     }
@@ -1515,9 +1545,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    delete axios.defaults.headers.common["Authorization"];
   };
 
   return (
@@ -1530,7 +1560,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -1540,18 +1570,18 @@ export const useAuth = () => {
 
 ```typescript
 // components/common/ProtectedRoute.tsx
-import { useAuth } from '../../context/AuthContext';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useAuth } from "../../context/AuthContext";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: string[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  allowedRoles = [] 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  allowedRoles = [],
 }) => {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -1559,12 +1589,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        router.push('/login');
+        router.push("/login");
         return;
       }
 
       if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-        router.push('/unauthorized');
+        router.push("/unauthorized");
         return;
       }
     }
@@ -1588,8 +1618,8 @@ export default ProtectedRoute;
 
 ```typescript
 // components/student/InterviewSession.tsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 interface Question {
   id: number;
@@ -1604,8 +1634,8 @@ interface InterviewSessionProps {
 const InterviewSession: React.FC<InterviewSessionProps> = ({ sessionId }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answer, setAnswer] = useState('');
-  const [feedback, setFeedback] = useState('');
+  const [answer, setAnswer] = useState("");
+  const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
@@ -1613,15 +1643,19 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ sessionId }) => {
   const startInterview = async () => {
     try {
       setLoading(true);
-      const response = await axios.post(`/api/interviews/${sessionId}/start_interview/`);
-      setQuestions(response.data.questions.map((q: string, index: number) => ({
-        id: index + 1,
-        question_text: q,
-        question_order: index + 1
-      })));
+      const response = await axios.post(
+        `/api/interviews/${sessionId}/start_interview/`
+      );
+      setQuestions(
+        response.data.questions.map((q: string, index: number) => ({
+          id: index + 1,
+          question_text: q,
+          question_order: index + 1,
+        }))
+      );
       setSessionStarted(true);
     } catch (error) {
-      console.error('Error starting interview:', error);
+      console.error("Error starting interview:", error);
     } finally {
       setLoading(false);
     }
@@ -1632,25 +1666,28 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ sessionId }) => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`/api/interviews/${sessionId}/submit_answer/`, {
-        question_id: questions[currentQuestionIndex].id,
-        answer: answer
-      });
+      const response = await axios.post(
+        `/api/interviews/${sessionId}/submit_answer/`,
+        {
+          question_id: questions[currentQuestionIndex].id,
+          answer: answer,
+        }
+      );
 
       setScore(response.data.score);
       setFeedback(response.data.feedback);
-      
+
       // Move to next question after 3 seconds
       setTimeout(() => {
         if (currentQuestionIndex < questions.length - 1) {
           setCurrentQuestionIndex(currentQuestionIndex + 1);
-          setAnswer('');
+          setAnswer("");
           setScore(null);
-          setFeedback('');
+          setFeedback("");
         }
       }, 3000);
     } catch (error) {
-      console.error('Error submitting answer:', error);
+      console.error("Error submitting answer:", error);
     } finally {
       setLoading(false);
     }
@@ -1665,7 +1702,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ sessionId }) => {
           disabled={loading}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
-          {loading ? 'Starting...' : 'Start Interview'}
+          {loading ? "Starting..." : "Start Interview"}
         </button>
       </div>
     );
@@ -1675,7 +1712,10 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ sessionId }) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <h1 className="text-3xl font-bold mb-8">Interview Completed!</h1>
-        <p>Thank you for completing the interview. Results will be available shortly.</p>
+        <p>
+          Thank you for completing the interview. Results will be available
+          shortly.
+        </p>
       </div>
     );
   }
@@ -1690,12 +1730,12 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ sessionId }) => {
             Question {currentQuestionIndex + 1} of {questions.length}
           </span>
         </div>
-        
+
         <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">
             {currentQuestion.question_text}
           </h2>
-          
+
           <textarea
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
@@ -1703,7 +1743,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ sessionId }) => {
             className="w-full h-32 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={loading || score !== null}
           />
-          
+
           <div className="mt-4 flex justify-between items-center">
             <span className="text-sm text-gray-500">
               {answer.length} characters
@@ -1713,7 +1753,7 @@ const InterviewSession: React.FC<InterviewSessionProps> = ({ sessionId }) => {
               disabled={loading || !answer.trim() || score !== null}
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
             >
-              {loading ? 'Submitting...' : 'Submit Answer'}
+              {loading ? "Submitting..." : "Submit Answer"}
             </button>
           </div>
         </div>
@@ -1739,6 +1779,7 @@ export default InterviewSession;
 ### 3.1 Security Measures
 
 #### Interview Session Security
+
 ```python
 # apps/interviews/middleware.py
 from django.utils import timezone
@@ -1755,15 +1796,15 @@ class InterviewSecurityMiddleware:
             session_id = request.path.split('/')[-2]
             try:
                 session = InterviewSession.objects.get(id=session_id)
-                
+
                 # Check if user is authorized
                 if request.user != session.student:
                     return JsonResponse({'error': 'Unauthorized'}, status=403)
-                
+
                 # Check time window
                 if not session.is_accessible():
                     return JsonResponse({'error': 'Interview not accessible'}, status=403)
-                    
+
             except InterviewSession.DoesNotExist:
                 return JsonResponse({'error': 'Session not found'}, status=404)
 
@@ -1818,7 +1859,7 @@ class InterviewConsumer(AsyncWebsocketConsumer):
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -1870,3 +1911,4 @@ services:
 
 volumes:
   postgres_data:
+```

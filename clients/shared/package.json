@@ -1,7 +1,7 @@
 {
-  "name": "nero-shared",
+  "name": "talentlens-shared",
   "version": "1.0.0",
-  "description": "Shared utilities and services for Nero Skill Trainer",
+  "description": "Shared utilities and services for TalentLens",
   "main": "index.js",
   "scripts": {
     "install-deps": "npm install"

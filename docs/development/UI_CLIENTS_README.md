@@ -1,6 +1,6 @@
-# Nero Skill Trainer - Professional Frontend Implementation
+# TalentLens - Professional Frontend Implementation
 
-This is the completed professional frontend for the Nero Skill Trainer AI-powered interview training platform.
+This is the completed professional frontend for the TalentLens AI-powered interview training platform.
 
 ## 🚀 Features Implemented
 
@@ -270,4 +270,4 @@ Ready for implementation:
 - **Efficient re-rendering** with React optimization
 - **Bundle optimization** for production builds
 
-This frontend implementation provides a solid, professional foundation for the Nero Skill Trainer platform with modern development practices and excellent user experience.
+This frontend implementation provides a solid, professional foundation for the TalentLens platform with modern development practices and excellent user experience.
