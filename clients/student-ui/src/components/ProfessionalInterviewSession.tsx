@@ -184,7 +184,7 @@ const ProfessionalInterviewSession: React.FC<ProfessionalInterviewSessionProps> 
   useEffect(() => {
     let stream: MediaStream | null = null;
     let isMounted = true;
-    let videoInitTimeout: number | null = null;
+    let videoInitTimeout: NodeJS.Timeout | null = null;
 
     const initCamera = async () => {
       try {
@@ -912,7 +912,7 @@ const ProfessionalInterviewSession: React.FC<ProfessionalInterviewSessionProps> 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loading size="large" message="Loading interview session..." />
+        <Loading size="lg" />
       </div>
     );
   }
@@ -977,7 +977,7 @@ const ProfessionalInterviewSession: React.FC<ProfessionalInterviewSessionProps> 
               </div>
             </div>
             <p className="text-neutral-600 dark:text-neutral-300 mt-4 max-w-2xl mx-auto leading-relaxed">
-              You're about to begin a comprehensive professional interview. This session will evaluate your technical skills, 
+              You&apos;re about to begin a comprehensive professional interview. This session will evaluate your technical skills, 
               problem-solving abilities, and communication style through adaptive questioning.
             </p>
           </div>
@@ -1153,7 +1153,7 @@ const ProfessionalInterviewSession: React.FC<ProfessionalInterviewSessionProps> 
         <Card className="max-w-lg mx-auto text-center p-8">
           {isSubmitting ? (
             <>
-              <Loading size="large" />
+              <Loading size="lg" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mt-4 mb-2">
                 Submitting Your Responses
               </h2>

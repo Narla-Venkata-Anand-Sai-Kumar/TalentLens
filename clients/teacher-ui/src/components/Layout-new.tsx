@@ -12,7 +12,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout, isAuthenticated, loading } = useAuth();
-  const { notifications, unreadCount } = useNotifications();
+  const { unreadCount } = useNotifications();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationCenterOpen, setNotificationCenterOpen] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
@@ -222,7 +222,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <NotificationCenter
         isOpen={notificationCenterOpen}
         onClose={() => setNotificationCenterOpen(false)}
-        notifications={notifications}
       />
     </div>
   );

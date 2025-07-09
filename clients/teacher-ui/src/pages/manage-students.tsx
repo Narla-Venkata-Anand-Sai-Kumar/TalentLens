@@ -52,14 +52,12 @@ const ManageStudentsPage: React.FC = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState('');
-  const [studentLimitInfo, setStudentLimitInfo] = useState<StudentLimitInfo | null>(null);
   
   // Password change modal states
 
 
   useEffect(() => {
     fetchStudents();
-    fetchStudentLimitInfo();
   }, []);
 
   const fetchStudents = async () => {
@@ -71,15 +69,6 @@ const ManageStudentsPage: React.FC = () => {
       console.error('Error fetching students:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchStudentLimitInfo = async () => {
-    try {
-      const response = await apiService.getStudentLimitInfo();
-      setStudentLimitInfo(response.data);
-    } catch (error) {
-      console.error('Error fetching student limit info:', error);
     }
   };
 
@@ -149,7 +138,6 @@ const ManageStudentsPage: React.FC = () => {
       });
       setShowCreateForm(false);
       fetchStudents(); // Refresh the student list
-      fetchStudentLimitInfo(); // Refresh limit info
       
       // Clear success message after 10 seconds
       setTimeout(() => setSuccessMessage(''), 10000);
@@ -214,40 +202,7 @@ const ManageStudentsPage: React.FC = () => {
             <p className="mt-2 text-gray-600">Create and manage your student accounts</p>
             
             {/* Premium Status and Student Count */}
-            {studentLimitInfo && (
-              <div className="mt-4 flex items-center space-x-4">
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  studentLimitInfo.has_premium 
-                    ? 'bg-purple-100 text-purple-800' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {studentLimitInfo.has_premium ? (
-                    <>
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
-                      Premium Account
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      Free Account
-                    </>
-                  )}
-                </div>
-                <div className="text-sm text-gray-600">
-                  <span className="font-medium">Students: {studentLimitInfo.current_student_count}</span>
-                  {studentLimitInfo.student_limit && (
-                    <span>/{studentLimitInfo.student_limit}</span>
-                  )}
-                  {studentLimitInfo.has_premium && (
-                    <span className="text-purple-600 ml-1">(Unlimited)</span>
-                  )}
-                </div>
-              </div>
-            )}
+            
           </div>
 
         {successMessage && (
@@ -288,46 +243,13 @@ const ManageStudentsPage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Student Limit Warning */}
-            {studentLimitInfo && !studentLimitInfo.has_premium && studentLimitInfo.current_student_count >= 2 && (
-              <div className={`mb-4 p-4 rounded-lg ${
-                studentLimitInfo.can_add_student 
-                  ? 'bg-yellow-50 border border-yellow-200' 
-                  : 'bg-red-50 border border-red-200'
-              }`}>
-                <div className="flex items-center">
-                  <svg className={`w-5 h-5 mr-2 ${
-                    studentLimitInfo.can_add_student ? 'text-yellow-600' : 'text-red-600'
-                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                  <div>
-                    <p className={`font-medium ${
-                      studentLimitInfo.can_add_student ? 'text-yellow-800' : 'text-red-800'
-                    }`}>
-                      {studentLimitInfo.can_add_student ? 'Approaching Student Limit' : 'Student Limit Reached'}
-                    </p>
-                    <p className={`text-sm ${
-                      studentLimitInfo.can_add_student ? 'text-yellow-700' : 'text-red-700'
-                    }`}>
-                      {studentLimitInfo.message}
-                    </p>
-                    {!studentLimitInfo.can_add_student && (
-                      <p className="text-sm text-red-700 mt-1">
-                        <strong>Upgrade to Premium</strong> to add unlimited students and unlock advanced features.
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
             
             {!showCreateForm ? (
               <button
                 onClick={() => setShowCreateForm(true)}
-                disabled={studentLimitInfo && !studentLimitInfo.can_add_student}
+                disabled={false}
                 className={`px-6 py-2 rounded-md font-medium ${
-                  studentLimitInfo && !studentLimitInfo.can_add_student
+                  false
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                 }`}
@@ -423,15 +345,14 @@ const ManageStudentsPage: React.FC = () => {
                 <div className="flex space-x-3">
                   <button
                     type="submit"
-                    disabled={createLoading || (studentLimitInfo && !studentLimitInfo.can_add_student)}
+                    disabled={createLoading || false}
                     className={`px-6 py-2 rounded-md font-medium ${
-                      createLoading || (studentLimitInfo && !studentLimitInfo.can_add_student)
+                      createLoading || false
                         ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
                         : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     }`}
                   >
                     {createLoading ? 'Creating...' : 
-                     (studentLimitInfo && !studentLimitInfo.can_add_student) ? 'Student Limit Reached' : 
                      'Create Student'}
                   </button>
                   <button

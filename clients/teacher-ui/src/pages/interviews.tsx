@@ -349,11 +349,10 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
               {interview.status?.replace('_', ' ').toUpperCase() || 'UNKNOWN'}
             </span>
             <span className={`px-2 py-1 text-xs rounded-full ${getDifficultyColor(interview.difficulty_level)}`}>
-              {interview.difficulty_level === 'entry' ? 'ENTRY LEVEL' :
+              {interview.difficulty_level === 'beginner' ? 'ENTRY LEVEL' :
                interview.difficulty_level === 'intermediate' ? 'MID-LEVEL' :
-               interview.difficulty_level === 'senior' ? 'SENIOR LEVEL' :
-               interview.difficulty_level === 'executive' ? 'EXECUTIVE' :
-               interview.difficulty_level?.toUpperCase() || 'MID-LEVEL'}
+               interview.difficulty_level === 'advanced' ? 'SENIOR LEVEL' :
+               'MID-LEVEL'}
             </span>
           </div>
         </div>
@@ -499,10 +498,9 @@ const CreateInterviewForm: React.FC<CreateInterviewFormProps> = ({ interview, on
             onChange={handleChange}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
-            <option value="entry">Entry Level</option>
+            <option value="beginner">Entry Level</option>
             <option value="intermediate">Mid-Level</option>
-            <option value="senior">Senior Level</option>
-            <option value="executive">Executive Level</option>
+            <option value="advanced">Senior Level</option>
           </select>
         </div>
       </div>

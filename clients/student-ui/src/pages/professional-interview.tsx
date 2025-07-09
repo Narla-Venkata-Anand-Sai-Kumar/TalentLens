@@ -74,7 +74,7 @@ const ProfessionalInterview: React.FC = () => {
   
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
-  const questionTimerRef = useRef<number | null>(null);
+  const questionTimerRef = useRef<NodeJS.Timeout | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   // Get session ID from URL
@@ -634,7 +634,7 @@ const ProfessionalInterview: React.FC = () => {
                 Camera & Audio Setup
               </h2>
               <p className="text-gray-600">
-                Let's make sure your camera and microphone are working properly
+                Let&apos;s make sure your camera and microphone are working properly
               </p>
             </div>
 

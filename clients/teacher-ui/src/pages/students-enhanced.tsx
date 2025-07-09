@@ -508,7 +508,7 @@ const StudentsPage: React.FC = () => {
 
       // Enhance students with resume and progress information
       const enhancedStudents: StudentWithProgress[] = studentsData.map(student => {
-        const studentResume = resumesData.find(resume => resume.user === student.id);
+        const studentResume = resumesData.find(resume => resume.student === student.id);
         
         // Calculate progress metrics (mock data for now - would come from actual interview data)
         const interviewsCompleted = Math.floor(Math.random() * 10);

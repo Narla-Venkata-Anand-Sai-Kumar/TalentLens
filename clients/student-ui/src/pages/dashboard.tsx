@@ -101,7 +101,7 @@ const DashboardPage: React.FC = () => {
                   <svg className="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className="text-sm font-medium">Last login: {formatDate(user?.last_login || new Date().toISOString())}</span>
+                  <span className="text-sm font-medium">Last login: {formatDate(new Date().toISOString())}</span>
                 </div>
               </div>
             </div>
@@ -220,7 +220,7 @@ const DashboardPage: React.FC = () => {
                     </svg>
                     <p className="font-medium text-gray-900">No interviews scheduled yet</p>
                     <p className="text-sm mt-1 text-gray-600">
-                      Your teacher will schedule interviews for you. Once scheduled, they'll appear here.
+                      Your teacher will schedule interviews for you. Once scheduled, they&apos;ll appear here.
                     </p>
                     <div className="mt-4 space-y-2">
                       <Button 

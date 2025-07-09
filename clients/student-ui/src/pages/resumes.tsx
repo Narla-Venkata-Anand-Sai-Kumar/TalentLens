@@ -463,7 +463,7 @@ const ResumesPage: React.FC = () => {
                       <h3 className="text-xl font-semibold text-gray-900 mb-3">No Content Available</h3>
                       <p className="text-gray-600 max-w-md mx-auto">
                         The resume content is not available for preview. This might be due to processing issues 
-                        or the resume hasn't been fully processed yet.
+                        or the resume hasn&apos;t been fully processed yet.
                       </p>
                     </CardContent>
                   </Card>
@@ -660,7 +660,7 @@ const ResumesPage: React.FC = () => {
                       </div>
                       <h3 className="text-xl font-semibold text-gray-900 mb-3">No AI Analysis Available</h3>
                       <p className="text-gray-600 mb-4 max-w-md mx-auto">
-                        Your resume hasn't been analyzed by our AI system yet. The analysis will provide insights
+                        Your resume hasn&apos;t been analyzed by our AI system yet. The analysis will provide insights
                         about your skills, experience, and suggestions for improvement.
                       </p>
                       <button
@@ -689,8 +689,8 @@ const ResumesPage: React.FC = () => {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">No Resume Uploaded</h3>
               <p className="text-gray-600 mb-4 max-w-md mx-auto">
-                Your teacher hasn't uploaded a resume for you yet. Once your teacher uploads your resume, 
-                you'll be able to view it here, see AI analysis, and download it for your use.
+                Your teacher hasn&apos;t uploaded a resume for you yet. Once your teacher uploads your resume, 
+                you&apos;ll be able to view it here, see AI analysis, and download it for your use.
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
                 <div className="flex items-start">
@@ -698,7 +698,7 @@ const ResumesPage: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-blue-800 mb-1">Why can't I upload my resume?</p>
+                    <p className="text-sm font-medium text-blue-800 mb-1">Why can&apos;t I upload my resume?</p>
                     <p className="text-sm text-blue-700">
                       To ensure quality and consistency, only teachers can upload and manage student resumes. 
                       Contact your teacher if you need your resume uploaded or updated.

@@ -184,7 +184,7 @@ const StudentResumeUploadModal: React.FC<StudentResumeUploadModalProps> = ({
           <Button
             type="submit"
             variant="primary"
-            loading={uploading}
+            isLoading={uploading}
             disabled={!file || !selectedStudentId || !title.trim()}
           >
             {uploading ? 'Uploading...' : 'Upload Resume'}
@@ -228,7 +228,10 @@ const StudentResumeManagementPage: React.FC = () => {
       ]);
       
       setResumes(resumesResponse.data);
-      setStudents(studentsResponse.data.results || studentsResponse.data);
+      const studentsData = Array.isArray(studentsResponse.data)
+        ? studentsResponse.data
+        : studentsResponse.data.results;
+      setStudents(studentsData);
     } catch (error: any) {
       console.error('Error fetching data:', error);
       showToast('Failed to load data', 'error');
@@ -370,7 +373,7 @@ const StudentResumeManagementPage: React.FC = () => {
                       </div>
                       
                       <p className="text-sm text-gray-600 mb-3">
-                        <span className="font-medium">Student:</span> {getStudentName(resume.user)}
+                        <span className="font-medium">Student:</span> {getStudentName(resume.student)}
                       </p>
                       
                       {resume.description && (
@@ -486,7 +489,7 @@ const StudentResumeManagementPage: React.FC = () => {
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{selectedResume.title}</h3>
                 <p className="text-sm text-gray-600">
-                  Student: {getStudentName(selectedResume.user)}
+                  Student: {getStudentName(selectedResume.student)}
                 </p>
               </div>
               

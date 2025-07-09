@@ -332,7 +332,7 @@ const StudentHomePage: React.FC = () => {
                       </div>
                     </div>
                     <blockquote className="text-gray-700 italic leading-relaxed">
-                      "{testimonial.quote}"
+                      &quot;{testimonial.quote}&quot;
                     </blockquote>
                     <div className="mt-4 flex text-yellow-400">
                       {[...Array(5)].map((_, i) => (

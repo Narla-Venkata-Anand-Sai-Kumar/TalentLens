@@ -216,14 +216,14 @@ const ResumesPage: React.FC = () => {
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">No Resume Uploaded</h3>
               <p className="text-gray-600 mb-4">
-                Your teacher hasn't uploaded a resume for you yet.
+                Your teacher hasn&apos;t uploaded a resume for you yet.
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
                 <h4 className="text-sm font-medium text-blue-800 mb-2">What happens next?</h4>
                 <ul className="text-sm text-blue-700 space-y-1">
                   <li>• Your teacher will upload your resume</li>
                   <li>• It will be analyzed by AI for skills and experience</li>
-                  <li>• You'll be able to view the analysis and extracted information</li>
+                  <li>• You&apos;ll be able to view the analysis and extracted information</li>
                   <li>• Resume data will be used to personalize your interview questions</li>
                 </ul>
               </div>

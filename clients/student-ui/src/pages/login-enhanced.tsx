@@ -191,7 +191,7 @@ const EnhancedLoginPage: React.FC = () => {
         {/* Register Link */}
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" className="text-blue-600 hover:text-blue-500 font-medium">
               Sign up for free
             </Link>
@@ -202,7 +202,7 @@ const EnhancedLoginPage: React.FC = () => {
         <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
           <CardContent className="px-6 py-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-              What you'll get with TalentLens
+              What you&apos;ll get with TalentLens
             </h4>
             <div className="space-y-3">
               <div className="flex items-start">

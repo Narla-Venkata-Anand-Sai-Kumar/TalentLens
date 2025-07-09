@@ -84,21 +84,21 @@ const DemoPage: React.FC = () => {
           
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <Button
-              variant={activeDemo === 'interview' ? 'default' : 'outline'}
+              variant={activeDemo === 'interview' ? 'primary' : 'outline'}
               onClick={() => setActiveDemo('interview')}
               className="px-6 py-3"
             >
               🎯 Interview Practice
             </Button>
             <Button
-              variant={activeDemo === 'resume' ? 'default' : 'outline'}
+              variant={activeDemo === 'resume' ? 'primary' : 'outline'}
               onClick={() => setActiveDemo('resume')}
               className="px-6 py-3"
             >
               📄 Resume Analysis
             </Button>
             <Button
-              variant={activeDemo === 'analytics' ? 'default' : 'outline'}
+              variant={activeDemo === 'analytics' ? 'primary' : 'outline'}
               onClick={() => setActiveDemo('analytics')}
               className="px-6 py-3"
             >
@@ -120,7 +120,7 @@ const DemoPage: React.FC = () => {
                 <div className="space-y-6">
                   <div className="bg-blue-50 rounded-lg p-6">
                     <h3 className="font-semibold text-blue-900 mb-3">🤖 AI Interviewer</h3>
-                    <p className="text-blue-800">{currentDemo.mockData.question}</p>
+                    <p className="text-blue-800">{(currentDemo.mockData as any)?.question || ""}</p>
                   </div>
                   
                   <div className="bg-gray-50 rounded-lg p-6">
@@ -136,11 +136,11 @@ const DemoPage: React.FC = () => {
 
                   <div className="bg-green-50 rounded-lg p-6">
                     <h3 className="font-semibold text-green-900 mb-3">✅ AI Feedback</h3>
-                    <p className="text-green-800 mb-3">{currentDemo.mockData.feedback}</p>
+                    <p className="text-green-800 mb-3">{(currentDemo.mockData as any)?.feedback || ""}</p>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm text-green-700">Score:</span>
                       <div className="bg-green-500 text-white px-2 py-1 rounded text-sm font-medium">
-                        {currentDemo.mockData.score}/100
+                        {(currentDemo.mockData as any)?.score}/100
                       </div>
                     </div>
                   </div>
@@ -167,13 +167,13 @@ const DemoPage: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-blue-800">Overall Score</span>
                         <span className="bg-blue-500 text-white px-3 py-1 rounded font-medium">
-                          {currentDemo.mockData.score}/100
+                          {(currentDemo.mockData as any)?.score}/100
                         </span>
                       </div>
                       <div className="w-full bg-blue-200 rounded-full h-2">
                         <div 
                           className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${currentDemo.mockData.score}%` }}
+                          style={{ width: `${(currentDemo.mockData as any)?.score}%` } }
                         />
                       </div>
                     </div>
@@ -182,7 +182,7 @@ const DemoPage: React.FC = () => {
                   <div className="bg-green-50 rounded-lg p-6">
                     <h3 className="font-semibold text-green-900 mb-3">✅ Strengths</h3>
                     <ul className="space-y-2">
-                      {currentDemo.mockData.strengths.map((strength, index) => (
+                      {((currentDemo.mockData as any)?.strengths || []).map((strength, index) => (
                         <li key={index} className="flex items-center space-x-2">
                           <span className="text-green-600">•</span>
                           <span className="text-green-800">{strength}</span>
@@ -198,12 +198,12 @@ const DemoPage: React.FC = () => {
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-blue-50 rounded-lg p-4 text-center">
-                      <div className="text-2xl font-bold text-blue-900">{currentDemo.mockData.overallScore}</div>
+                      <div className="text-2xl font-bold text-blue-900">{(currentDemo.mockData as any)?.overallScore}</div>
                       <div className="text-sm text-blue-600">Overall Score</div>
-                      <div className="text-xs text-green-600">{currentDemo.mockData.trend}</div>
+                      <div className="text-xs text-green-600">{(currentDemo.mockData as any)?.trend}</div>
                     </div>
                     <div className="bg-green-50 rounded-lg p-4 text-center">
-                      <div className="text-2xl font-bold text-green-900">{currentDemo.mockData.sessionsCompleted}</div>
+                      <div className="text-2xl font-bold text-green-900">{(currentDemo.mockData as any)?.sessionsCompleted}</div>
                       <div className="text-sm text-green-600">Sessions Completed</div>
                     </div>
                   </div>
@@ -229,7 +229,7 @@ const DemoPage: React.FC = () => {
                     <div className="bg-green-50 rounded-lg p-4">
                       <h4 className="font-semibold text-green-900 mb-2">💪 Strong Areas</h4>
                       <ul className="space-y-1">
-                        {currentDemo.mockData.strongAreas.map((area, index) => (
+                        {(currentDemo.mockData as any)?.strongAreas?.map((area, index) => (
                           <li key={index} className="text-sm text-green-800 flex items-center space-x-2">
                             <span>✅</span>
                             <span>{area}</span>
@@ -240,7 +240,7 @@ const DemoPage: React.FC = () => {
                     <div className="bg-orange-50 rounded-lg p-4">
                       <h4 className="font-semibold text-orange-900 mb-2">🎯 Focus Areas</h4>
                       <ul className="space-y-1">
-                        {currentDemo.mockData.improvementAreas.map((area, index) => (
+                        {(currentDemo.mockData as any)?.improvementAreas?.map((area, index) => (
                           <li key={index} className="text-sm text-orange-800 flex items-center space-x-2">
                             <span>🔄</span>
                             <span>{area}</span>
@@ -266,7 +266,7 @@ const DemoPage: React.FC = () => {
               <CardContent>
                 <div className="space-y-4">
                   <div className="bg-blue-50 rounded-lg p-4">
-                    <h3 className="font-semibold text-blue-900 mb-2">What's Next?</h3>
+                    <h3 className="font-semibold text-blue-900 mb-2">What&apos;s Next?</h3>
                     <ul className="space-y-2 text-sm text-blue-800">
                       <li>• Contact your teacher for account creation</li>
                       <li>• Complete your profile setup</li>

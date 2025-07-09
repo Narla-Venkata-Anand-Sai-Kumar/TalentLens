@@ -322,6 +322,8 @@ const AnalyticsDashboard: React.FC = () => {
                         value: item.count,
                         level: `Avg: ${item.average_score.toFixed(1)}%`
                       }))}
+                      dataKey="value"
+                      nameKey="name"
                       className="h-64"
                     />
                   ) : (
@@ -344,6 +346,8 @@ const AnalyticsDashboard: React.FC = () => {
                         skill: skill.skill.charAt(0).toUpperCase() + skill.skill.slice(1),
                         score: skill.average_score
                       }))}
+                      xKey="skill"
+                      yKey="score"
                       className="h-64"
                     />
                   ) : (

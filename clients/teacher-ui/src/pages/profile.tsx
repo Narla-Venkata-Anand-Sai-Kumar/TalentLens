@@ -134,14 +134,15 @@ const ProfilePage: React.FC = () => {
     try {
       // Fetch real stats from the dashboard API
       const response = await apiService.getDashboardStats();
-      const dashboardData = response.data;
+      const dashboardData: any = response.data;
       
-      setStats({
+      const mappedStats = {
         totalStudents: dashboardData.total_students || 0,
-        totalInterviews: dashboardData.interviews_conducted || 0,
-        avgScore: dashboardData.average_student_score || 0,
-        lastLogin: new Date().toISOString(), // This would come from user activity tracking
-      });
+        totalInterviews: dashboardData.total_interviews || 0,
+        avgScore: dashboardData.average_score || 0,
+        lastLogin: new Date().toISOString(),
+      };
+      setStats(mappedStats);
     } catch (error) {
       console.error('Error loading stats:', error);
       // Fallback to mock data if API fails

@@ -82,6 +82,20 @@ class ApiService {
     return this.api.post('/auth/signup/', userData);
   }
 
+  // Alias for compatibility
+  async register(userData: {
+    email: string;
+    password: string;
+    password_confirm: string;
+    first_name: string;
+    last_name: string;
+    role: string;
+    username?: string;
+    phone_number?: string;
+  }): Promise<AxiosResponse<AuthTokens>> {
+    return this.signup(userData);
+  }
+
   async refreshToken(refresh: string): Promise<AxiosResponse<{ access: string }>> {
     return this.api.post('/auth/token/refresh/', { refresh });
   }
@@ -97,6 +111,27 @@ class ApiService {
 
   async updateProfile(data: Partial<User>): Promise<AxiosResponse<User>> {
     return this.api.put('/auth/user/', data);
+  }
+
+  // User Management APIs (Admin/Teacher only)
+  async getUsers(params?: {
+    role?: string;
+    is_active?: boolean;
+    page?: number;
+  }): Promise<AxiosResponse<{ results: User[]; count: number }>> {
+    return this.api.get('/users/', { params });
+  }
+
+  async getUser(id: number): Promise<AxiosResponse<User>> {
+    return this.api.get(`/users/${id}/`);
+  }
+
+  async updateUser(id: number, data: Partial<User>): Promise<AxiosResponse<User>> {
+    return this.api.patch(`/users/${id}/`, data);
+  }
+
+  async deleteUser(id: number): Promise<AxiosResponse<void>> {
+    return this.api.delete(`/users/${id}/`);
   }
 
   // Student Interview methods (read-only + participate)
