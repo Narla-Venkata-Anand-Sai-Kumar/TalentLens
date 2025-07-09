@@ -10,6 +10,7 @@ interface AuthContextType {
   register: (userData: RegisterData) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   updateProfile: (profileData: Partial<User>) => Promise<{ success: boolean; error?: string }>;
+  refreshUser: () => Promise<void>; // Add method to refresh user data
   isAuthenticated: boolean;
   allowedRole: UserRole; // The role this client is designed for
 }
@@ -49,6 +50,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, allowedRol
       const response = await apiService.getCurrentUser();
       const userData = response.data;
       
+      console.log('Fetched user data:', userData); // Debug log
+      
       // Check if user belongs to this client
       if (userData.role !== allowedRole) {
         // Clear local storage and redirect to correct client
@@ -72,6 +75,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, allowedRol
     try {
       const response = await apiService.signin(email, password);
       const { access, refresh, user: userData } = response.data;
+
+      console.log('Login user data:', userData); // Debug log
 
       // Check if user has correct role for this client
       if (userData.role !== allowedRole) {
@@ -107,11 +112,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, allowedRol
         };
       }
 
+      console.log('Registration data being sent:', userData); // Debug log
+
       await apiService.register(userData);
       return { success: true };
     } catch (error: any) {
+      console.error('Registration error:', error); // Debug log
       const errorMessage = error.response?.data?.message || 
                           error.response?.data?.detail ||
+                          error.response?.data?.error ||
                           error.message || 
                           'Registration failed';
       return { success: false, error: errorMessage };
@@ -131,6 +140,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, allowedRol
         // Redirect to this client's home page
         window.location.href = '/';
       }
+    }
+  };
+
+  const refreshUser = async (): Promise<void> => {
+    if (!user) return;
+    
+    try {
+      const response = await apiService.getCurrentUser();
+      const userData = response.data;
+      console.log('Refreshed user data:', userData); // Debug log
+      setUser(userData);
+    } catch (error) {
+      console.error('Error refreshing user data:', error);
     }
   };
 
@@ -155,6 +177,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, allowedRol
     register,
     logout,
     updateProfile,
+    refreshUser,
     isAuthenticated: !!user,
     allowedRole,
   };

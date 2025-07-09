@@ -11,12 +11,20 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { user, logout, isAuthenticated, loading } = useAuth();
+  const { user, logout, isAuthenticated, loading, refreshUser } = useAuth();
   const { notifications, unreadCount } = useNotifications();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationCenterOpen, setNotificationCenterOpen] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const router = useRouter();
+
+  // Auto-refresh user data if name is missing but user is authenticated
+  React.useEffect(() => {
+    if (user && (!user.first_name || !user.last_name) && user.email) {
+      console.log('User data incomplete, refreshing...', user);
+      refreshUser();
+    }
+  }, [user, refreshUser]);
 
   // Check if the current route requires authentication
   const protectedRoutes = ['/dashboard', '/interviews', '/resumes', '/students', '/analytics', '/profile', '/settings'];
@@ -101,6 +109,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       ),
       roles: ['administrator', 'teacher'],
     },
+    {
+      name: 'Profile',
+      href: '/profile',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+      roles: ['administrator', 'teacher'],
+    },
   ];
 
   const filteredNavigation = navigation.filter(item => 
@@ -175,23 +193,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Profile dropdown */}
                 <div className="relative">
-                  <div className="flex items-center space-x-3">
+                  <Link href="/profile" className="flex items-center space-x-3 hover:bg-gray-50 rounded-lg p-2 transition-colors">
                     <div className="flex-shrink-0">
                       <div className="h-10 w-10 rounded-full bg-emerald-500 flex items-center justify-center">
                         <span className="text-sm font-medium text-white">
-                          {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
+                          {user?.first_name && user?.last_name 
+                            ? `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`
+                            : user?.email?.charAt(0)?.toUpperCase() || 'U'
+                          }
                         </span>
                       </div>
                     </div>
                     <div className="hidden md:block">
                       <div className="text-base font-medium text-gray-800">
-                        {user?.first_name} {user?.last_name}
+                        {user?.first_name && user?.last_name 
+                          ? `${user.first_name} ${user.last_name}`
+                          : user?.email || 'Loading...'
+                        }
                       </div>
                       <div className="text-sm font-medium text-gray-500">
-                        {user?.email}
+                        View Profile
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -278,24 +302,30 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
 
         <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
           <div className="flex items-center w-full">
-            <div className="flex-shrink-0">
-              <div className="h-10 w-10 rounded-full bg-emerald-500 flex items-center justify-center">
-                <span className="text-sm font-medium text-white">
-                  {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
-                </span>
+            <Link href="/profile" className="flex items-center w-full hover:bg-gray-50 rounded-md p-2 -m-2 transition-colors">
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <span className="text-sm font-medium text-white">
+                    {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="ml-3 flex-1">
-              <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                {user?.first_name} {user?.last_name}
-              </p>
-              <button
-                onClick={handleLogout}
-                className="text-xs font-medium text-gray-500 group-hover:text-gray-700 hover:underline"
-              >
-                Sign out
-              </button>
-            </div>
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                  {user?.first_name} {user?.last_name}
+                </p>
+                <p className="text-xs text-gray-500">View Profile</p>
+              </div>
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="ml-2 text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 transition-colors"
+              title="Sign out"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>

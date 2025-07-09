@@ -103,6 +103,14 @@ class ApiService {
     return this.api.patch('/auth/user/', data);
   }
 
+  async changePassword(data: {
+    old_password: string;
+    new_password: string;
+    new_password_confirm: string;
+  }): Promise<AxiosResponse<{ message: string }>> {
+    return this.api.post('/auth/change-password/', data);
+  }
+
   // Interview APIs
   async getInterviews(params?: {
     status?: string;
@@ -278,6 +286,18 @@ class ApiService {
     is_active?: boolean;
   }): Promise<AxiosResponse<User>> {
     return this.api.post('/users/', userData);
+  }
+
+  // Create student account (for teachers)
+  async createStudent(studentData: {
+    email: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+    phone_number?: string;
+    is_active?: boolean;
+  }): Promise<AxiosResponse<User>> {
+    return this.api.post('/users/create_student/', studentData);
   }
 
   // Enhanced student management

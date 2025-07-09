@@ -105,11 +105,9 @@ const StudentModal: React.FC<StudentModalProps> = ({ isOpen, onClose, student, o
       } else {
         const newStudentData = {
           ...formData,
-          role: 'student' as const,
           password: 'TempPass123!',
-          password_confirm: 'TempPass123!',
         };
-        await apiService.register(newStudentData);
+        await apiService.createStudent(newStudentData);
         showToast('Student created successfully', 'success');
       }
       
