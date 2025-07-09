@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../utils/helpers';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface ModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ const Modal: React.FC<ModalProps> = ({
   closeOnOverlayClick = true,
   closeOnEscape = true,
 }) => {
+  const { isDark } = useTheme();
   useEffect(() => {
     if (!closeOnEscape) return;
 
@@ -66,7 +68,8 @@ const Modal: React.FC<ModalProps> = ({
       {/* Modal */}
       <div
         className={cn(
-          'relative bg-white rounded-lg shadow-xl w-full',
+          'relative rounded-lg shadow-xl w-full',
+          isDark ? 'bg-gray-800' : 'bg-white',
           sizes[size],
           'max-h-[90vh] overflow-hidden flex flex-col'
         )}
@@ -74,15 +77,24 @@ const Modal: React.FC<ModalProps> = ({
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className={cn(
+            'flex items-center justify-between p-6 border-b',
+            isDark ? 'border-gray-700' : 'border-gray-200'
+          )}>
             <div>
               {title && (
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className={cn(
+                  'text-xl font-semibold',
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                )}>
                   {title}
                 </h2>
               )}
               {description && (
-                <p className="mt-1 text-sm text-gray-500">
+                <p className={cn(
+                  'mt-1 text-sm',
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                )}>
                   {description}
                 </p>
               )}
@@ -90,7 +102,12 @@ const Modal: React.FC<ModalProps> = ({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className={cn(
+                  'transition-colors',
+                  isDark 
+                    ? 'text-gray-400 hover:text-gray-200' 
+                    : 'text-gray-400 hover:text-gray-600'
+                )}
               >
                 <svg
                   className="w-6 h-6"

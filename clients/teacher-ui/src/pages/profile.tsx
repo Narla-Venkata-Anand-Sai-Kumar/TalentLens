@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { apiService } from '../utils/api';
 import { User } from '../types';
 import { formatDate } from '../utils/helpers';
+import { useFormStyles, useTextStyles } from '../utils/formStyles';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Loading from '../components/ui/Loading';
@@ -20,6 +22,9 @@ interface ProfileStats {
 
 const ProfilePage: React.FC = () => {
   const { user, isAuthenticated, updateProfile, logout } = useAuth();
+  const { theme, setTheme, isDark } = useTheme();
+  const formStyles = useFormStyles();
+  const textStyles = useTextStyles();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences' | 'stats'>('profile');
@@ -46,16 +51,58 @@ const ProfilePage: React.FC = () => {
   const [preferencesData, setPreferencesData] = useState({
     email_notifications: true,
     sms_notifications: false,
+    push_notifications: true,
     auto_save_drafts: true,
     theme: 'light',
     language: 'en',
     timezone: 'UTC',
+    compact_view: false,
+    show_tips: true,
+    profile_visibility: 'organization',
   });
 
   // Profile stats
   const [stats, setStats] = useState<ProfileStats>({});
 
   const { showToast } = useToast();
+
+  // Utility for form styling
+  const getFormClasses = () => ({
+    label: `block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-emerald-700'}`,
+    input: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+      isDark 
+        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+        : 'bg-white border-gray-300 text-gray-900'
+    }`,
+    disabledInput: `w-full px-3 py-2 border rounded-md ${
+      isDark 
+        ? 'bg-gray-800 border-gray-600 text-gray-400' 
+        : 'bg-gray-50 border-gray-300 text-gray-500'
+    }`,
+    textarea: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+      isDark 
+        ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+        : 'bg-white border-gray-300 text-gray-900'
+    }`,
+    select: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+      isDark 
+        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+        : 'bg-white border-gray-300 text-gray-900'
+    }`,
+    helpText: `text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`,
+    heading: `text-lg font-medium mb-4 ${isDark ? 'text-gray-100' : 'text-gray-900'}`,
+  });
+
+  // Load user preferences from backend
+  const loadPreferences = async () => {
+    try {
+      const response = await apiService.getUserPreferences();
+      setPreferencesData(response.data);
+    } catch (error) {
+      console.error('Failed to load preferences:', error);
+      // Fallback to default preferences
+    }
+  };
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -72,11 +119,8 @@ const ProfilePage: React.FC = () => {
         phone_number: user.profile?.phone_number || '',
       });
 
-      // Load user preferences from localStorage or API
-      const savedPrefs = localStorage.getItem('userPreferences');
-      if (savedPrefs) {
-        setPreferencesData({ ...preferencesData, ...JSON.parse(savedPrefs) });
-      }
+      // Load preferences from backend
+      loadPreferences();
 
       // Load profile stats for teachers
       if (user.role === 'teacher') {
@@ -181,10 +225,17 @@ const ProfilePage: React.FC = () => {
     setLoading(true);
 
     try {
-      // Save preferences to localStorage
+      // Update preferences in backend
+      await apiService.updateUserPreferences(preferencesData);
+      
+      // Update theme context if theme changed
+      if (preferencesData.theme !== theme) {
+        setTheme(preferencesData.theme as 'light' | 'dark' | 'auto');
+      }
+      
+      // Backup to localStorage
       localStorage.setItem('userPreferences', JSON.stringify(preferencesData));
       
-      // In a real app, you'd also save to backend
       showToast('Preferences saved successfully!', 'success');
     } catch (error) {
       console.error('Preferences save error:', error);
@@ -252,69 +303,69 @@ const ProfilePage: React.FC = () => {
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-emerald-700 mb-2">
+                    <label className={getFormClasses().label}>
                       First Name *
                     </label>
                     <input
                       type="text"
                       value={formData.first_name}
                       onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={getFormClasses().input}
                       required
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-emerald-700 mb-2">
+                    <label className={getFormClasses().label}>
                       Last Name *
                     </label>
                     <input
                       type="text"
                       value={formData.last_name}
                       onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={getFormClasses().input}
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-emerald-700 mb-2">
+                  <label className={formStyles.labelRequired}>
                     Email Address
                   </label>
                   <input
                     type="email"
                     value={formData.email}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                    className={formStyles.inputDisabled}
                     disabled
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className={formStyles.helperText}>
                     Email address cannot be changed
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-emerald-700 mb-2">
+                  <label className={formStyles.labelRequired}>
                     Phone Number
                   </label>
                   <input
                     type="tel"
                     value={formData.phone_number}
                     onChange={(e) => setFormData(prev => ({ ...prev, phone_number: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className={formStyles.input}
                     placeholder="Enter your phone number"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-emerald-700 mb-2">
+                  <label className={formStyles.labelRequired}>
                     Bio
                   </label>
                   <textarea
                     value={formData.bio}
                     onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className={formStyles.textarea}
                     placeholder="Tell us about yourself..."
                   />
                 </div>
@@ -343,44 +394,44 @@ const ProfilePage: React.FC = () => {
               <CardContent>
                 <form onSubmit={handlePasswordSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-emerald-700 mb-2">
+                    <label className={formStyles.labelRequired}>
                       Current Password *
                     </label>
                     <input
                       type="password"
                       value={passwordData.old_password}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, old_password: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={formStyles.input}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-emerald-700 mb-2">
+                    <label className={formStyles.labelRequired}>
                       New Password *
                     </label>
                     <input
                       type="password"
                       value={passwordData.new_password}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, new_password: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={formStyles.input}
                       required
                       minLength={8}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className={formStyles.helperText}>
                       Password must be at least 8 characters long
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-emerald-700 mb-2">
+                    <label className={formStyles.labelRequired}>
                       Confirm New Password *
                     </label>
                     <input
                       type="password"
                       value={passwordData.new_password_confirm}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, new_password_confirm: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className={formStyles.input}
                       required
                       minLength={8}
                     />
@@ -440,60 +491,65 @@ const ProfilePage: React.FC = () => {
             <CardContent>
               <form onSubmit={handlePreferencesSubmit} className="space-y-6">
                 <div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Notifications</h4>
+                  <h4 className={formStyles.sectionHeading}>Notifications</h4>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Email Notifications</label>
-                        <p className="text-sm text-gray-500">Receive notifications via email</p>
+                        <label className={formStyles.label}>Email Notifications</label>
+                        <p className={formStyles.helperText}>Receive notifications via email</p>
                       </div>
                       <input
                         type="checkbox"
                         checked={preferencesData.email_notifications}
                         onChange={(e) => setPreferencesData(prev => ({ ...prev, email_notifications: e.target.checked }))}
-                        className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                        className={formStyles.checkbox}
                       />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">SMS Notifications</label>
-                        <p className="text-sm text-gray-500">Receive notifications via SMS</p>
+                        <label className={formStyles.label}>SMS Notifications</label>
+                        <p className={formStyles.helperText}>Receive notifications via SMS</p>
                       </div>
                       <input
                         type="checkbox"
                         checked={preferencesData.sms_notifications}
                         onChange={(e) => setPreferencesData(prev => ({ ...prev, sms_notifications: e.target.checked }))}
-                        className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                        className={formStyles.checkbox}
                       />
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Application</h4>
+                  <h4 className={formStyles.sectionHeading}>Application</h4>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Auto-save Drafts</label>
-                        <p className="text-sm text-gray-500">Automatically save your work</p>
+                        <label className={formStyles.label}>Auto-save Drafts</label>
+                        <p className={formStyles.helperText}>Automatically save your work</p>
                       </div>
                       <input
                         type="checkbox"
                         checked={preferencesData.auto_save_drafts}
                         onChange={(e) => setPreferencesData(prev => ({ ...prev, auto_save_drafts: e.target.checked }))}
-                        className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                        className={formStyles.checkbox}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className={formStyles.label}>
                         Theme
                       </label>
                       <select
                         value={preferencesData.theme}
-                        onChange={(e) => setPreferencesData(prev => ({ ...prev, theme: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        onChange={(e) => {
+                          const newTheme = e.target.value as 'light' | 'dark' | 'auto';
+                          setPreferencesData(prev => ({ ...prev, theme: newTheme }));
+                          // Update theme immediately for better UX
+                          setTheme(newTheme);
+                        }}
+                        className={formStyles.select}
                       >
                         <option value="light">Light</option>
                         <option value="dark">Dark</option>
@@ -502,13 +558,13 @@ const ProfilePage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className={formStyles.label}>
                         Language
                       </label>
                       <select
                         value={preferencesData.language}
                         onChange={(e) => setPreferencesData(prev => ({ ...prev, language: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        className={formStyles.select}
                       >
                         <option value="en">English</option>
                         <option value="es">Spanish</option>
@@ -518,13 +574,13 @@ const ProfilePage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className={formStyles.label}>
                         Timezone
                       </label>
                       <select
                         value={preferencesData.timezone}
                         onChange={(e) => setPreferencesData(prev => ({ ...prev, timezone: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        className={formStyles.select}
                       >
                         <option value="UTC">UTC</option>
                         <option value="America/New_York">Eastern Time</option>

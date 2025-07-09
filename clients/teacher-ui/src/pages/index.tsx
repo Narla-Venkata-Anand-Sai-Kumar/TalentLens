@@ -1,11 +1,13 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 
 const TeacherHomePage: React.FC = () => {
   const { isAuthenticated, user, loading } = useAuth();
+  const { isDark } = useTheme();
   const router = useRouter();
 
   React.useEffect(() => {
@@ -62,7 +64,7 @@ const TeacherHomePage: React.FC = () => {
       <div className="relative py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            <h1 className={`text-4xl font-bold tracking-tight sm:text-6xl ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
               Empower Your Students with
               <span className="text-emerald-600"> AI-Powered Interviews</span>
             </h1>
@@ -78,7 +80,7 @@ const TeacherHomePage: React.FC = () => {
               </Link>
               <Link
                 href="/signin"
-                className="text-lg font-semibold leading-6 text-gray-900 hover:text-emerald-600"
+                className={`text-lg font-semibold leading-6 hover:text-emerald-600 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
               >
                 Sign In <span aria-hidden="true">→</span>
               </Link>

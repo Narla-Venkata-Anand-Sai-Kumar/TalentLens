@@ -169,7 +169,7 @@ class ApiService {
 
   // Additional methods used in components
   async startInterview(sessionId: number): Promise<AxiosResponse<any>> {
-    return this.api.post(`/interviews/${sessionId}/start/`);
+    return this.api.post(`/interviews/${sessionId}/start_interview/`);
   }
 
   async generateQuestions(sessionId: number, data: any): Promise<AxiosResponse<any>> {
@@ -181,7 +181,7 @@ class ApiService {
   }
 
   async completeInterview(sessionId: number): Promise<AxiosResponse<any>> {
-    return this.api.post(`/interviews/${sessionId}/complete/`);
+    return this.api.post(`/interviews/${sessionId}/complete_interview/`);
   }
 
   async getPerformanceMetrics(filters?: any): Promise<AxiosResponse<any>> {

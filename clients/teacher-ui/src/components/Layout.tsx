@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useNotifications } from '../hooks';
 import { cn } from '../utils/helpers';
 import NotificationCenter from './NotificationCenter';
@@ -12,6 +13,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout, isAuthenticated, loading, refreshUser } = useAuth();
+  const { theme, isDark, toggleTheme } = useTheme();
   const { notifications, unreadCount } = useNotifications();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationCenterOpen, setNotificationCenterOpen] = useState(false);
@@ -126,14 +128,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={cn("min-h-screen", isDark ? "bg-gray-900" : "bg-gray-50")}>
       {/* Mobile sidebar */}
       <div className={cn(
         'fixed inset-0 flex z-40 md:hidden',
         sidebarOpen ? 'block' : 'hidden'
       )}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+        <div className={cn("relative flex-1 flex flex-col max-w-xs w-full", isDark ? "bg-gray-800" : "bg-white")}>
           <div className="absolute top-0 right-0 -mr-12 pt-2">
             <button
               onClick={() => setSidebarOpen(false)}
@@ -156,10 +158,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main content */}
       <div className="md:pl-64 flex flex-col flex-1">
         {/* Top bar */}
-        <div className="sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-gray-50">
+        <div className={cn("sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3", isDark ? "bg-gray-900" : "bg-gray-50")}>
           <button
             onClick={() => setSidebarOpen(true)}
-            className="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500"
+            className={cn(
+              "-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500",
+              isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-900"
+            )}
           >
             <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -168,18 +173,41 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* Header */}
-        <header className="bg-white shadow">
+        <header className={cn("shadow", isDark ? "bg-gray-800" : "bg-white")}>
           <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className={cn("text-3xl font-bold", isDark ? "text-gray-100" : "text-gray-900")}>
                 {getPageTitle(router.pathname)}
               </h1>
               
               <div className="flex items-center space-x-4">
+                {/* Theme Toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className={cn(
+                    "p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500",
+                    isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-500"
+                  )}
+                  title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+                >
+                  {isDark ? (
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  ) : (
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                  )}
+                </button>
+
                 {/* Notifications */}
                 <button
                   type="button"
-                  className="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 rounded-full"
+                  className={cn(
+                    "relative p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500",
+                    isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-500"
+                  )}
                   onClick={() => setNotificationCenterOpen(true)}
                 >
                   <span className="sr-only">View notifications</span>
@@ -193,7 +221,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Profile dropdown */}
                 <div className="relative">
-                  <Link href="/profile" className="flex items-center space-x-3 hover:bg-gray-50 rounded-lg p-2 transition-colors">
+                  <Link href="/profile" className={cn("flex items-center space-x-3 rounded-lg p-2 transition-colors", isDark ? "hover:bg-gray-700" : "hover:bg-gray-50")}>
                     <div className="flex-shrink-0">
                       <div className="h-10 w-10 rounded-full bg-emerald-500 flex items-center justify-center">
                         <span className="text-sm font-medium text-white">
@@ -205,13 +233,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       </div>
                     </div>
                     <div className="hidden md:block">
-                      <div className="text-base font-medium text-gray-800">
+                      <div className={cn("text-base font-medium", isDark ? "text-gray-200" : "text-gray-800")}>
                         {user?.first_name && user?.last_name 
                           ? `${user.first_name} ${user.last_name}`
                           : user?.email || 'Loading...'
                         }
                       </div>
-                      <div className="text-sm font-medium text-gray-500">
+                      <div className={cn("text-sm font-medium", isDark ? "text-gray-400" : "text-gray-500")}>
                         View Profile
                       </div>
                     </div>
@@ -222,7 +250,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        <main className="flex-1">
+        <main className={cn("flex-1", isDark ? "bg-gray-900" : "bg-gray-50")}>
           <div className="py-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               {children}
@@ -253,6 +281,7 @@ interface SidebarContentProps {
 const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => {
   const router = useRouter();
   const { logout } = useAuth();
+  const { isDark } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -265,7 +294,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
 
   return (
     <>
-      <div className="flex-1 flex flex-col min-h-0 bg-white border-r border-gray-200">
+      <div className={cn("flex-1 flex flex-col min-h-0 border-r", isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200")}>
         <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
           <div className="flex items-center flex-shrink-0 px-4">
             <h2 className="text-xl font-bold text-emerald-600">
@@ -273,7 +302,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
             </h2>
           </div>
           
-          <nav className="mt-8 flex-1 px-2 bg-white space-y-1">
+          <nav className={cn("mt-8 flex-1 px-2 space-y-1", isDark ? "bg-gray-800" : "bg-white")}>
             {navigation.map((item) => {
               const isActive = router.pathname === item.href;
               return (
@@ -282,13 +311,19 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
                   href={item.href}
                   className={cn(
                     isActive
-                      ? 'bg-emerald-100 text-emerald-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                      ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-100'
+                      : isDark 
+                        ? 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                     'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
                   )}
                 >
                   <span className={cn(
-                    isActive ? 'text-emerald-500' : 'text-gray-400 group-hover:text-gray-500',
+                    isActive 
+                      ? 'text-emerald-500' 
+                      : isDark 
+                        ? 'text-gray-400 group-hover:text-gray-300'
+                        : 'text-gray-400 group-hover:text-gray-500',
                     'mr-3 flex-shrink-0'
                   )}>
                     {item.icon}
@@ -300,9 +335,9 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
           </nav>
         </div>
 
-        <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+        <div className={cn("flex-shrink-0 flex border-t p-4", isDark ? "border-gray-700" : "border-gray-200")}>
           <div className="flex items-center w-full">
-            <Link href="/profile" className="flex items-center w-full hover:bg-gray-50 rounded-md p-2 -m-2 transition-colors">
+            <Link href="/profile" className={cn("flex items-center w-full rounded-md p-2 -m-2 transition-colors", isDark ? "hover:bg-gray-700" : "hover:bg-gray-50")}>
               <div className="flex-shrink-0">
                 <div className="h-10 w-10 rounded-full bg-emerald-500 flex items-center justify-center">
                   <span className="text-sm font-medium text-white">
@@ -311,15 +346,20 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
                 </div>
               </div>
               <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                <p className={cn("text-sm font-medium", isDark ? "text-gray-200 group-hover:text-gray-100" : "text-gray-700 group-hover:text-gray-900")}>
                   {user?.first_name} {user?.last_name}
                 </p>
-                <p className="text-xs text-gray-500">View Profile</p>
+                <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-500")}>View Profile</p>
               </div>
             </Link>
             <button
               onClick={handleLogout}
-              className="ml-2 text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 transition-colors"
+              className={cn(
+                "ml-2 p-1 rounded-md transition-colors",
+                isDark 
+                  ? "text-gray-400 hover:text-gray-200 hover:bg-gray-700" 
+                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+              )}
               title="Sign out"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

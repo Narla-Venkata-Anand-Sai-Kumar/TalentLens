@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { apiService } from '../utils/api';
 import { User, Resume, InterviewSession } from '../types';
 import { formatDate, formatFileSize } from '../utils/helpers';
@@ -643,7 +644,7 @@ const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
             screen_recording_detection: formData.is_secure_mode
           }
         };
-        return apiService.scheduleInterview(interviewData);
+        return apiService.createInterview(interviewData);
       });
 
       await Promise.all(interviewPromises);
@@ -860,6 +861,7 @@ const StudentAnalyticsModal: React.FC<StudentAnalyticsModalProps> = ({
   onClose, 
   student 
 }) => {
+  const { isDark } = useTheme();
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
@@ -927,15 +929,15 @@ const StudentAnalyticsModal: React.FC<StudentAnalyticsModalProps> = ({
             {/* Performance Improvement */}
             {analyticsData.performance_summary && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Performance Summary</h3>
+                <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Performance Summary</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <p className="text-sm text-gray-600">Overall Average</p>
-                    <p className="text-lg font-bold text-gray-900">{analyticsData.performance_summary.overall_average}%</p>
+                    <p className={`text-lg font-bold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{analyticsData.performance_summary.overall_average}%</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Recent Performance</p>
-                    <p className="text-lg font-bold text-gray-900">{analyticsData.performance_summary.recent_average}%</p>
+                    <p className={`text-lg font-bold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{analyticsData.performance_summary.recent_average}%</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Improvement</p>
@@ -953,7 +955,7 @@ const StudentAnalyticsModal: React.FC<StudentAnalyticsModalProps> = ({
             {/* Skills Breakdown */}
             {analyticsData.skills && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills Performance</h3>
+                <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Skills Performance</h3>
                 <div className="space-y-3">
                   {Object.entries(analyticsData.skills).map(([skill, score]: [string, any]) => (
                     <div key={skill} className="flex items-center justify-between">
@@ -967,7 +969,7 @@ const StudentAnalyticsModal: React.FC<StudentAnalyticsModalProps> = ({
                             style={{ width: `${Math.min(score, 100)}%` }}
                           />
                         </div>
-                        <span className="text-sm font-semibold text-gray-900 min-w-[3rem] text-right">
+                        <span className={`text-sm font-semibold min-w-[3rem] text-right ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
                           {score}%
                         </span>
                       </div>
@@ -980,7 +982,7 @@ const StudentAnalyticsModal: React.FC<StudentAnalyticsModalProps> = ({
             {/* Recent Interview History */}
             {analyticsData.recent_interviews && analyticsData.recent_interviews.length > 0 ? (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Interviews</h3>
+                <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Recent Interviews</h3>
                 <div className="space-y-3">
                   {analyticsData.recent_interviews.map((interview: any, index: number) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
@@ -1044,6 +1046,7 @@ const StudentAnalyticsModal: React.FC<StudentAnalyticsModalProps> = ({
 
 const StudentsPage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
+  const { isDark } = useTheme();
   const router = useRouter();
   const [students, setStudents] = useState<StudentWithProgress[]>([]);
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -1304,7 +1307,7 @@ const StudentsPage: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Manage Students</h1>
+            <h1 className={`text-3xl font-bold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Manage Students</h1>
             <p className="mt-2 text-gray-600">
               Comprehensive student management with progress tracking and resume management
             </p>

@@ -111,6 +111,19 @@ class ApiService {
     return this.api.post('/auth/change-password/', data);
   }
 
+  // User Preferences APIs
+  async getUserPreferences(): Promise<AxiosResponse<any>> {
+    return this.api.get('/users/preferences/');
+  }
+
+  async updateUserPreferences(data: any): Promise<AxiosResponse<any>> {
+    return this.api.put('/users/preferences/', data);
+  }
+
+  async updateTheme(theme: 'light' | 'dark' | 'auto'): Promise<AxiosResponse<{ theme: string }>> {
+    return this.api.patch('/users/theme/', { theme });
+  }
+
   // Interview APIs
   async getInterviews(params?: {
     status?: string;
@@ -137,46 +150,62 @@ class ApiService {
   }
 
   async startInterview(id: number): Promise<AxiosResponse<InterviewSession>> {
-    return this.api.post(`/interviews/${id}/start/`);
+    return this.api.post(`/interviews/${id}/start_interview/`);
   }
 
   async completeInterview(id: number): Promise<AxiosResponse<InterviewSession>> {
-    return this.api.post(`/interviews/${id}/complete/`);
+    return this.api.post(`/interviews/${id}/complete_interview/`);
   }
 
-  async generateQuestions(id: number, data: {
-    num_questions: number;
-    difficulty_level: string;
-    category: string;
-  }): Promise<AxiosResponse<{ questions: any[] }>> {
-    return this.api.post(`/interviews/${id}/generate-questions/`, data);
-  }
-
-  async submitAnswer(questionId: number, data: {
+  async submitAnswer(sessionId: number, data: {
+    question_id: number;
     answer_text: string;
-    time_taken?: number;
+    time_taken_seconds?: number;
   }): Promise<AxiosResponse<any>> {
-    return this.api.post(`/interviews/questions/${questionId}/submit/`, data);
+    return this.api.post(`/interviews/${sessionId}/submit_answer/`, data);
   }
 
-  async scheduleInterview(interviewData: {
-    student: number;
-    scheduled_datetime: string;
-    end_datetime: string;
-    interview_type: 'technical' | 'communication' | 'aptitude';
-    duration_minutes: number;
-    instructions?: string;
-    is_secure_mode?: boolean;
-    session_id?: string;
-    security_config?: {
-      tab_switch_limit: number;
-      warning_limit: number;
-      time_extension_allowed: boolean;
-      copy_paste_disabled: boolean;
-      screen_recording_detection: boolean;
+  // Interview session management APIs
+  async validateInterviewSession(id: number): Promise<AxiosResponse<{
+    valid: boolean;
+    session_id: string;
+    security_config: any;
+    tab_switches: number;
+    warning_count: number;
+    time_remaining: number;
+  }>> {
+    return this.api.post(`/interviews/${id}/validate_session/`);
+  }
+
+  async reportSecurityEvent(id: number, data: {
+    event_type: string;
+    event_data?: any;
+  }): Promise<AxiosResponse<{
+    event_recorded: boolean;
+    session_invalidated: boolean;
+    tab_switches: number;
+    warning_count: number;
+    violations_remaining: {
+      tab_switches: number;
+      warnings: number;
     };
-  }): Promise<AxiosResponse<InterviewSession>> {
-    return this.api.post('/interviews/', interviewData);
+  }>> {
+    return this.api.post(`/interviews/${id}/report_security_event/`, data);
+  }
+
+  async invalidateInterviewSession(id: number): Promise<AxiosResponse<{
+    session_invalidated: boolean;
+    message: string;
+  }>> {
+    return this.api.post(`/interviews/${id}/invalidate_session/`);
+  }
+
+  async getInterviewResults(id: number): Promise<AxiosResponse<any>> {
+    return this.api.get(`/interviews/${id}/get_results/`);
+  }
+
+  async getInterviewResponses(id: number): Promise<AxiosResponse<any>> {
+    return this.api.get(`/interviews/${id}/responses/`);
   }
 
   // Resume APIs

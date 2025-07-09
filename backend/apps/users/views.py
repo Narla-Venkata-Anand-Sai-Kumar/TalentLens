@@ -2,8 +2,8 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import User, TeacherStudentMapping
-from .serializers import UserSerializer, TeacherStudentMappingSerializer, StudentListSerializer
+from .models import User, TeacherStudentMapping, UserPreferences
+from .serializers import UserSerializer, TeacherStudentMappingSerializer, StudentListSerializer, UserPreferencesSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     """ViewSet for managing users"""
@@ -34,7 +34,47 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         return super().create(request, *args, **kwargs)
-    
+
+    @action(detail=False, methods=['get', 'put'])
+    def preferences(self, request):
+        """Get or update user preferences"""
+        user = request.user
+        
+        if request.method == 'GET':
+            # Get or create preferences for the user
+            preferences = UserPreferences.get_or_create_for_user(user)
+            serializer = UserPreferencesSerializer(preferences)
+            return Response(serializer.data)
+        
+        elif request.method == 'PUT':
+            # Update user preferences
+            preferences = UserPreferences.get_or_create_for_user(user)
+            serializer = UserPreferencesSerializer(preferences, data=request.data, partial=True)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['patch'])
+    def theme(self, request):
+        """Update only the theme preference"""
+        user = request.user
+        theme = request.data.get('theme')
+        
+        if theme not in ['light', 'dark', 'auto']:
+            return Response(
+                {'error': 'Invalid theme. Must be light, dark, or auto.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        preferences = UserPreferences.get_or_create_for_user(user)
+        preferences.theme = theme
+        preferences.save()
+        
+        return Response({'theme': preferences.theme})
+
     @action(detail=False, methods=['get'])
     def students(self, request):
         """Get list of students for teachers and administrators"""

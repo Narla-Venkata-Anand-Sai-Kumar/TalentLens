@@ -1,11 +1,23 @@
 from rest_framework import serializers
-from .models import User, TeacherStudentMapping
+from .models import User, TeacherStudentMapping, UserPreferences
+
+class UserPreferencesSerializer(serializers.ModelSerializer):
+    """Serializer for UserPreferences model"""
+    
+    class Meta:
+        model = UserPreferences
+        fields = [
+            'theme', 'email_notifications', 'sms_notifications', 
+            'push_notifications', 'auto_save_drafts', 'language', 
+            'timezone', 'compact_view', 'show_tips', 'profile_visibility'
+        ]
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for User model"""
     
     password = serializers.CharField(write_only=True)
     full_name = serializers.ReadOnlyField()
+    preferences = UserPreferencesSerializer(read_only=True)
     
     class Meta:
         model = User
@@ -13,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name', 
             'full_name', 'role', 'phone_number', 'profile_picture',
             'date_of_birth', 'address', 'is_active', 'date_joined',
-            'password'
+            'password', 'preferences'
         ]
         extra_kwargs = {
             'password': {'write_only': True},
@@ -25,6 +37,8 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         user.set_password(password)
         user.save()
+        # Create default preferences for new user
+        UserPreferences.get_or_create_for_user(user)
         return user
     
     def update(self, instance, validated_data):
@@ -34,6 +48,17 @@ class UserSerializer(serializers.ModelSerializer):
             user.set_password(password)
             user.save()
         return user
+    
+    def to_representation(self, instance):
+        """Include preferences in the response"""
+        data = super().to_representation(instance)
+        if hasattr(instance, 'preferences'):
+            data['preferences'] = UserPreferencesSerializer(instance.preferences).data
+        else:
+            # Create preferences if they don't exist
+            preferences = UserPreferences.get_or_create_for_user(instance)
+            data['preferences'] = UserPreferencesSerializer(preferences).data
+        return data
 
 class TeacherStudentMappingSerializer(serializers.ModelSerializer):
     """Serializer for TeacherStudentMapping model"""

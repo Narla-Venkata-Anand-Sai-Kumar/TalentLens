@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../utils/helpers';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface Toast {
   id: string;
@@ -84,6 +85,7 @@ interface ToastItemProps {
 }
 
 const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
+  const { isDark } = useTheme();
   const icons = {
     success: (
       <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -144,11 +146,11 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
             {icons[toast.type]}
           </div>
           <div className="flex-1 min-w-0 pr-2">
-            <p className="text-sm font-medium text-gray-900 break-words leading-relaxed">
+            <p className={`text-sm font-medium break-words leading-relaxed ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
               {toast.title}
             </p>
             {toast.description && (
-              <p className="mt-1 text-sm text-gray-500 break-words leading-relaxed">
+              <p className={`mt-1 text-sm break-words leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
                 {toast.description}
               </p>
             )}

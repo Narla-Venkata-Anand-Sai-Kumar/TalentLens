@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { apiService } from '../api';
 import Layout from '../components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
@@ -25,6 +26,7 @@ interface CreateStudentFormData {
 
 const ManageStudentsPage: React.FC = () => {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -374,7 +376,7 @@ const ManageStudentsPage: React.FC = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className={`divide-y ${isDark ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'}`}>
                     {students.map((student) => (
                       <tr key={student.id}>
                         <td className="px-6 py-4 whitespace-nowrap">

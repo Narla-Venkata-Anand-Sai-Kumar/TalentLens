@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { apiService } from '../api';
 import { Notification } from '../types';
 import { formatDate } from '../utils/helpers';
@@ -14,6 +15,7 @@ interface NotificationCenterProps {
 
 const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
@@ -84,16 +86,20 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
     switch (type) {
       case 'success':
         return (
-          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+            isDark ? 'bg-green-900/30' : 'bg-green-100'
+          }`}>
+            <svg className={`w-4 h-4 ${isDark ? 'text-green-400' : 'text-green-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
         );
       case 'warning':
         return (
-          <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+            isDark ? 'bg-yellow-900/30' : 'bg-yellow-100'
+          }`}>
+            <svg className={`w-4 h-4 ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.99-.833-2.732 0L5.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
@@ -151,13 +157,15 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
             </div>
           ) : notifications.length === 0 ? (
             <div className="text-center py-8">
-              <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-6 h-6 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5-5-5h5v-4a7.97 7.97 0 01-5.417-2.83A5.97 5.97 0 018 11.5V11a8 8 0 018-8 8 8 0 018 8v.5c0 .81-.267 1.56-.733 2.17A7.97 7.97 0 0120 17v-4z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
-              <p className="text-gray-500">You're all caught up!</p>
+              <h3 className={`text-lg font-medium mb-2 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>No notifications</h3>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>You're all caught up!</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -166,9 +174,13 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
                   key={notification.id}
                   className={`p-4 rounded-lg border transition-colors cursor-pointer ${
                     notification.is_read
-                      ? 'bg-white border-gray-200'
-                      : 'bg-blue-50 border-blue-200'
-                  } hover:bg-gray-50`}
+                      ? isDark 
+                        ? 'bg-gray-800 border-gray-700 hover:bg-gray-750'
+                        : 'bg-white border-gray-200 hover:bg-gray-50'
+                      : isDark
+                        ? 'bg-blue-900/30 border-blue-700 hover:bg-blue-900/40'
+                        : 'bg-blue-50 border-blue-200 hover:bg-blue-100'
+                  }`}
                   onClick={() => !notification.is_read && markAsRead(notification.id)}
                 >
                   <div className="flex items-start space-x-3">
@@ -178,12 +190,16 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h4 className={`text-sm font-medium ${
-                            notification.is_read ? 'text-gray-900' : 'text-blue-900'
+                            notification.is_read 
+                              ? isDark ? 'text-gray-100' : 'text-gray-900'
+                              : isDark ? 'text-blue-200' : 'text-blue-900'
                           }`}>
                             {notification.title}
                           </h4>
                           <p className={`text-sm mt-1 ${
-                            notification.is_read ? 'text-gray-600' : 'text-blue-700'
+                            notification.is_read 
+                              ? isDark ? 'text-gray-300' : 'text-gray-600'
+                              : isDark ? 'text-blue-300' : 'text-blue-700'
                           }`}>
                             {notification.message}
                           </p>
@@ -197,14 +213,18 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ isOpen, onClose
                       </div>
                       
                       <div className="mt-2 flex items-center justify-between">
-                        <span className="text-xs text-gray-500">
+                        <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                           {formatDate(notification.created_at)}
                         </span>
                         
                         {notification.action_url && (
                           <a
                             href={notification.action_url}
-                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                            className={`text-xs font-medium ${
+                              isDark 
+                                ? 'text-blue-400 hover:text-blue-300' 
+                                : 'text-blue-600 hover:text-blue-800'
+                            }`}
                             onClick={(e) => e.stopPropagation()}
                           >
                             View Details

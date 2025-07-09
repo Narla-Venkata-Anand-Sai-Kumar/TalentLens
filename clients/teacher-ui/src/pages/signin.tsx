@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { validateEmail } from '../utils/helpers';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -14,6 +15,7 @@ const TeacherSignInPage: React.FC = () => {
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
 
   const { login, isAuthenticated } = useAuth();
+  const { isDark } = useTheme();
   const { addToast } = useToast();
   const router = useRouter();
 
@@ -102,17 +104,21 @@ const TeacherSignInPage: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 00-2 2v2a2 2 0 002 2m0 0V9a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
             Teacher Portal
           </h1>
-          <p className="text-sm text-gray-600">
+          <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
             Empower your students with expert guidance and AI tools
           </p>
         </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative">
-        <div className="bg-white py-8 px-4 shadow-xl rounded-2xl sm:px-10 border border-gray-100">
+        <div className={`py-8 px-4 shadow-xl rounded-2xl sm:px-10 border ${
+          isDark 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-100'
+        }`}>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {errors.general && (
               <div className="rounded-lg bg-red-50 border border-red-200 p-4">
@@ -206,17 +212,25 @@ const TeacherSignInPage: React.FC = () => {
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
+                  <div className={`w-full border-t ${isDark ? 'border-gray-600' : 'border-gray-300'}`} />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">New educator?</span>
+                  <span className={`px-2 ${
+                    isDark 
+                      ? 'bg-gray-800 text-gray-400' 
+                      : 'bg-white text-gray-500'
+                  }`}>New educator?</span>
                 </div>
               </div>
 
               <div className="mt-6">
                 <Link
                   href="/signup"
-                  className="w-full flex justify-center py-3 px-4 border border-emerald-300 rounded-lg shadow-sm bg-white text-sm font-medium text-emerald-700 hover:bg-emerald-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                  className={`w-full flex justify-center py-3 px-4 border rounded-lg shadow-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 ${
+                    isDark
+                      ? 'border-emerald-600 bg-gray-700 text-emerald-400 hover:bg-gray-600'
+                      : 'border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-50'
+                  }`}
                 >
                   Join as Educator
                 </Link>
