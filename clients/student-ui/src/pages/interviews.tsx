@@ -67,6 +67,15 @@ const StudentsInterviewsPage: React.FC = () => {
     }
   };
 
+  const startProfessionalInterview = (interview: InterviewSession) => {
+    if ((interview.status === 'scheduled' || interview.status === 'pending') && 
+        new Date(interview.scheduled_datetime || interview.scheduled_time || '') <= new Date()) {
+      router.push(`/professional-interview?session_id=${interview.id}`);
+    } else {
+      showToast('Interview is not yet available', 'warning');
+    }
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -183,14 +192,25 @@ const StudentsInterviewsPage: React.FC = () => {
                       )}
                     </div>
                     <div className="mt-4">
-                      <Button
-                        size="sm"
-                        onClick={() => joinInterview(interview)}
-                        disabled={new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date()}
-                        className="w-full"
-                      >
-                        {new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date() ? 'Scheduled' : 'Join Interview'}
-                      </Button>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          onClick={() => joinInterview(interview)}
+                          disabled={new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date()}
+                          className="flex-1"
+                        >
+                          {new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date() ? 'Scheduled' : 'Join Interview'}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => startProfessionalInterview(interview)}
+                          disabled={new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date()}
+                          className="flex-1"
+                        >
+                          Professional Mode
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -291,13 +311,23 @@ const StudentsInterviewsPage: React.FC = () => {
 
                     <div className="ml-6 flex flex-col space-y-2">
                       {(interview.status === 'scheduled' || interview.status === 'pending') && (
-                        <Button
-                          size="sm"
-                          onClick={() => joinInterview(interview)}
-                          disabled={new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date()}
-                        >
-                          {new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date() ? 'Scheduled' : 'Join'}
-                        </Button>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            onClick={() => joinInterview(interview)}
+                            disabled={new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date()}
+                          >
+                            {new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date() ? 'Scheduled' : 'Join'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => startProfessionalInterview(interview)}
+                            disabled={new Date(interview.scheduled_datetime || interview.scheduled_time || '') > new Date()}
+                          >
+                            Professional
+                          </Button>
+                        </div>
                       )}
                       
                       {interview.status === 'completed' && (

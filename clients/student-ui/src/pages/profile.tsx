@@ -8,6 +8,21 @@ import Button from '../components/ui/Button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../components/ui/Card';
 import Loading from '../components/ui/Loading';
 import { useToast } from '../hooks';
+import ProfileStats from '../components/ProfileStats';
+import RecentActivity from '../components/RecentActivity';
+import { 
+  UserIcon, 
+  ShieldCheckIcon, 
+  CalendarIcon, 
+  IdentificationIcon, 
+  CogIcon, 
+  HomeIcon,
+  ChartBarIcon,
+  ChatIcon,
+  DocumentIcon,
+  MailIcon,
+  PhoneIcon
+} from '../components/ui/Icons';
 
 const ProfilePage: React.FC = () => {
   const { user, isAuthenticated, updateProfile } = useAuth();
@@ -27,6 +42,42 @@ const ProfilePage: React.FC = () => {
   });
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const { showToast } = useToast();
+
+  // Sample recent activity data - in a real app, this would come from an API
+  const recentActivities = [
+    {
+      id: '1',
+      type: 'interview' as const,
+      title: 'Technical Interview Completed',
+      description: 'Successfully completed a technical interview with a score of 8.5/10',
+      timestamp: '2 hours ago',
+      status: 'completed' as const
+    },
+    {
+      id: '2',
+      type: 'resume' as const,
+      title: 'Resume Updated',
+      description: 'Updated your resume with new skills and experience',
+      timestamp: '1 day ago',
+      status: 'completed' as const
+    },
+    {
+      id: '3',
+      type: 'score' as const,
+      title: 'New Personal Best',
+      description: 'Achieved your highest score yet in behavioral interviews',
+      timestamp: '3 days ago',
+      status: 'completed' as const
+    },
+    {
+      id: '4',
+      type: 'interview' as const,
+      title: 'Interview Scheduled',
+      description: 'Upcoming behavioral interview scheduled for tomorrow',
+      timestamp: '5 days ago',
+      status: 'scheduled' as const
+    }
+  ];
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -143,103 +194,134 @@ const ProfilePage: React.FC = () => {
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center mb-4">
-            <span className="text-2xl font-bold text-primary-600">
-              {user.first_name.charAt(0)}{user.last_name.charAt(0)}
-            </span>
+          <div className="mx-auto w-32 h-32 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mb-6 shadow-lg">
+            <UserIcon className="w-16 h-16 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
             {user.first_name} {user.last_name}
           </h1>
-          <div className="mt-2 flex justify-center">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getRoleBadgeColor(user.role)}`}>
+          <div className="flex justify-center items-center space-x-4 mb-4">
+            <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${getRoleBadgeColor(user.role)}`}>
+              <IdentificationIcon className="w-4 h-4 mr-2" />
               {getRoleDisplay(user.role)}
             </span>
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+              user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            }`}>
+              <ShieldCheckIcon className="w-3 h-3 mr-1" />
+              {user.is_active ? 'Active' : 'Inactive'}
+            </span>
           </div>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            {user.profile?.bio || 'Welcome to your profile! Add a bio to tell others about yourself.'}
+          </p>
         </div>
+
+        {/* Profile Statistics */}
+        <ProfileStats
+          stats={{
+            totalInterviews: 12, // This would come from API in real app
+            completedInterviews: 8,
+            averageScore: 7.8,
+            resumesUploaded: 3,
+            memberSince: formatDate(user.date_joined),
+            lastActivity: formatDate(new Date().toISOString())
+          }}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Information */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-900">Profile Information</h3>
+                <div className="flex items-center space-x-2">
+                  <UserIcon className="w-5 h-5 text-primary-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Profile Information</h3>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">Update your personal information and bio</p>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        <UserIcon className="w-4 h-4 mr-2 text-gray-500" />
                         First Name *
                       </label>
                       <input
                         type="text"
                         value={formData.first_name}
                         onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         required
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        <UserIcon className="w-4 h-4 mr-2 text-gray-500" />
                         Last Name *
                       </label>
                       <input
                         type="text"
                         value={formData.last_name}
                         onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         required
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                      <MailIcon className="w-4 h-4 mr-2 text-gray-500" />
                       Email Address
                     </label>
                     <input
                       type="email"
                       value={formData.email}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
                       disabled
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Email address cannot be changed
+                    <p className="text-xs text-gray-500 mt-2 flex items-center">
+                      <ShieldCheckIcon className="w-3 h-3 mr-1" />
+                      Email address cannot be changed for security reasons
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                      <PhoneIcon className="w-4 h-4 mr-2 text-gray-500" />
                       Phone Number
                     </label>
                     <input
                       type="tel"
                       value={formData.phone_number}
                       onChange={(e) => setFormData(prev => ({ ...prev, phone_number: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your phone number"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                      <ChatIcon className="w-4 h-4 mr-2 text-gray-500" />
                       Bio
                     </label>
                     <textarea
                       value={formData.bio}
                       onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="Tell us about yourself..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Tell us about yourself, your goals, and what you're passionate about..."
                     />
                   </div>
 
-                  <div className="flex justify-end">
+                  <div className="flex justify-end pt-4 border-t border-gray-200">
                     <Button
                       type="submit"
                       isLoading={loading}
+                      className="px-6 py-3"
                     >
                       Save Changes
                     </Button>
@@ -252,16 +334,22 @@ const ProfilePage: React.FC = () => {
             <Card className="mt-6">
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-gray-900">Password & Security</h3>
+                  <div className="flex items-center space-x-2">
+                    <CogIcon className="w-5 h-5 text-primary-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">Password & Security</h3>
+                  </div>
                   {!showPasswordForm && (
                     <Button
                       variant="outline"
                       onClick={() => setShowPasswordForm(true)}
+                      className="flex items-center space-x-2"
                     >
-                      Change Password
+                      <CogIcon className="w-4 h-4" />
+                      <span>Change Password</span>
                     </Button>
                   )}
                 </div>
+                <p className="text-sm text-gray-600 mt-1">Keep your account secure with a strong password</p>
               </CardHeader>
               
               {showPasswordForm && (
@@ -340,39 +428,56 @@ const ProfilePage: React.FC = () => {
           <div>
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-900">Account Information</h3>
+                <div className="flex items-center space-x-2">
+                  <IdentificationIcon className="w-5 h-5 text-primary-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Account Information</h3>
+                </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Account Status</label>
-                  <div className="mt-1">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {user.is_active ? 'Active' : 'Inactive'}
-                    </span>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-500 flex items-center">
+                        <ShieldCheckIcon className="w-4 h-4 mr-2" />
+                        Account Status
+                      </label>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                        user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {user.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Member Since</label>
-                  <p className="text-sm text-gray-900 mt-1">
-                    {formatDate(user.date_joined)}
-                  </p>
-                </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <label className="text-sm font-medium text-gray-500 flex items-center mb-2">
+                      <CalendarIcon className="w-4 h-4 mr-2" />
+                      Member Since
+                    </label>
+                    <p className="text-sm text-gray-900 font-medium">
+                      {formatDate(user.date_joined)}
+                    </p>
+                  </div>
 
-                <div>
-                  <label className="text-sm font-medium text-gray-500">User ID</label>
-                  <p className="text-sm text-gray-900 mt-1">
-                    #{user.id}
-                  </p>
-                </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <label className="text-sm font-medium text-gray-500 flex items-center mb-2">
+                      <IdentificationIcon className="w-4 h-4 mr-2" />
+                      User ID
+                    </label>
+                    <p className="text-sm text-gray-900 font-mono">
+                      #{user.id}
+                    </p>
+                  </div>
 
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Role</label>
-                  <p className="text-sm text-gray-900 mt-1">
-                    {getRoleDisplay(user.role)}
-                  </p>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <label className="text-sm font-medium text-gray-500 flex items-center mb-2">
+                      <UserIcon className="w-4 h-4 mr-2" />
+                      Role
+                    </label>
+                    <p className="text-sm text-gray-900 font-medium">
+                      {getRoleDisplay(user.role)}
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -380,40 +485,47 @@ const ProfilePage: React.FC = () => {
             {/* Quick Actions */}
             <Card className="mt-6">
               <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                <div className="flex items-center space-x-2">
+                  <HomeIcon className="w-5 h-5 text-primary-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">Navigate to key areas of your account</p>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button
                   variant="outline"
                   onClick={() => router.push('/dashboard')}
-                  className="w-full justify-start"
+                  className="w-full justify-start hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-                  </svg>
+                  <HomeIcon className="w-4 h-4 mr-3 text-primary-600" />
                   Go to Dashboard
                 </Button>
 
                 <Button
                   variant="outline"
                   onClick={() => router.push('/interviews')}
-                  className="w-full justify-start"
+                  className="w-full justify-start hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
+                  <ChatIcon className="w-4 h-4 mr-3 text-primary-600" />
                   View Interviews
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => router.push('/analytics')}
+                  className="w-full justify-start hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
+                >
+                  <ChartBarIcon className="w-4 h-4 mr-3 text-primary-600" />
+                  View Progress
                 </Button>
 
                 {user.role === 'student' && (
                   <Button
                     variant="outline"
                     onClick={() => router.push('/resumes')}
-                    className="w-full justify-start"
+                    className="w-full justify-start hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293L16 6.586A1 1 0 0116 7v10a2 2 0 01-2 2z" />
-                    </svg>
+                    <DocumentIcon className="w-4 h-4 mr-3 text-primary-600" />
                     Manage Resumes
                   </Button>
                 )}

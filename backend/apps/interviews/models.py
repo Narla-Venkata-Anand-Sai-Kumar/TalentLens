@@ -18,6 +18,7 @@ class InterviewSession(models.Model):
         ('completed', 'Completed'),
         ('missed', 'Missed'),
         ('cancelled', 'Cancelled'),
+        ('terminated', 'Terminated'),
     ]
     
     student = models.ForeignKey(
@@ -52,6 +53,31 @@ class InterviewSession(models.Model):
     security_violations = models.JSONField(default=list, blank=True)
     session_token = models.CharField(max_length=255, null=True, blank=True)
     is_session_valid = models.BooleanField(default=True)
+    
+    # Enhanced fields for professional interview
+    security_metadata = models.JSONField(default=dict, blank=True)
+    actual_duration = models.IntegerField(null=True, blank=True)  # Actual duration in minutes
+    time_limit = models.IntegerField(default=300)  # Time limit in seconds
+    category = models.CharField(max_length=50, blank=True)  # Additional category field
+    expected_answer_length = models.CharField(
+        max_length=20,
+        choices=[
+            ('short', 'Short (1-2 sentences)'),
+            ('medium', 'Medium (1-2 paragraphs)'),
+            ('long', 'Long (3+ paragraphs)')
+        ],
+        default='medium'
+    )
+    evaluation_criteria = models.JSONField(default=dict, blank=True)  # Criteria for evaluation
+    difficulty_level = models.CharField(
+        max_length=20, 
+        choices=[
+            ('easy', 'Easy'),
+            ('medium', 'Medium'), 
+            ('hard', 'Hard')
+        ],
+        default='medium'
+    )
     
     class Meta:
         db_table = 'interview_sessions'
@@ -116,6 +142,21 @@ class InterviewQuestion(models.Model):
         default='medium'
     )
     
+    # Enhanced fields for professional interview
+    time_limit = models.IntegerField(default=300)  # Time limit in seconds
+    category = models.CharField(max_length=50, blank=True)  # Question category
+    expected_answer_length = models.CharField(
+        max_length=20,
+        choices=[
+            ('short', 'Short (1-2 sentences)'),
+            ('medium', 'Medium (1-2 paragraphs)'),
+            ('long', 'Long (3+ paragraphs)')
+        ],
+        default='medium'
+    )
+    evaluation_criteria = models.JSONField(default=dict, blank=True)  # Criteria for evaluation
+    order = models.IntegerField(default=0)  # Question order in session
+    
     class Meta:
         db_table = 'interview_questions'
         ordering = ['question_order']
@@ -143,6 +184,12 @@ class InterviewResponse(models.Model):
     completeness_score = models.IntegerField(null=True, blank=True)
     clarity_score = models.IntegerField(null=True, blank=True)
     example_score = models.IntegerField(null=True, blank=True)
+    
+    # Enhanced fields for professional interview responses
+    audio_recording_url = models.URLField(blank=True)  # URL to audio recording
+    transcription_confidence = models.FloatField(null=True, blank=True)  # Transcription confidence score
+    evaluation_details = models.JSONField(default=dict, blank=True)  # Detailed evaluation
+    response_quality_score = models.IntegerField(null=True, blank=True)  # Quality score out of 100
     
     class Meta:
         db_table = 'interview_responses'

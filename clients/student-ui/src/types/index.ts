@@ -48,7 +48,7 @@ export interface InterviewSession {
   category?: string;
   interview_type?: 'technical' | 'communication' | 'aptitude';
   difficulty_level?: 'beginner' | 'intermediate' | 'advanced';
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'pending' | 'missed';
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'pending' | 'missed' | 'terminated';
   student: number;
   teacher?: number;
   student_name?: string; // From API

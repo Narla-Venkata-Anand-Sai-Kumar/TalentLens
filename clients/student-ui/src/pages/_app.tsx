@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { AuthProvider } from '../contexts/AuthContext';
+import { ThemeProvider } from '../contexts/ThemeContext';
 import { ToastProvider } from '../components/ui/Toast';
 import '../styles/globals.css';
 
@@ -14,11 +15,13 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <ToastProvider>
-      <AuthProvider allowedRole="student">
-        <Component {...pageProps} />
-      </AuthProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider allowedRole="student">
+          <Component {...pageProps} />
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

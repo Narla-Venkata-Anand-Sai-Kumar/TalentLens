@@ -200,6 +200,113 @@ class ApiService {
       },
     });
   }
+
+  // Professional Interview Methods
+  async validateInterviewSession(sessionId: number): Promise<{
+    valid: boolean;
+    reason?: string;
+    remaining_time?: number;
+    status?: string;
+    redirect_to?: string;
+  }> {
+    const response = await this.api.get(`/interviews/professional/${sessionId}/validate/`);
+    return response.data;
+  }
+
+  async getInterviewSession(sessionId: number): Promise<InterviewSession> {
+    const response = await this.api.get(`/interviews/professional/${sessionId}/`);
+    return response.data;
+  }
+
+  async generateDynamicQuestions(data: {
+    session_id: number;
+    remaining_time: number;
+    interview_type: string;
+    difficulty_level: string;
+    student_profile: any;
+  }): Promise<{
+    questions: any[];
+    total_questions: number;
+    estimated_duration: number;
+    difficulty_distribution: any;
+  }> {
+    const response = await this.api.post('/interviews/professional/generate_dynamic_questions/', data);
+    return response.data;
+  }
+
+  async transcribeAudio(formData: FormData): Promise<{
+    text: string;
+    confidence: number;
+    duration: number;
+  }> {
+    const response = await this.api.post('/interviews/professional/transcribe_audio/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  }
+
+  async recordSecurityEvent(sessionId: number, data: {
+    event_type: string;
+    event_data: any;
+  }): Promise<{
+    event_recorded: boolean;
+    violation_detected: boolean;
+    session_status: string;
+  }> {
+    const response = await this.api.post(`/interviews/professional/${sessionId}/security_event/`, data);
+    return response.data;
+  }
+
+  async invalidateInterviewSession(sessionId: number, data: {
+    reason: string;
+  }): Promise<{
+    session_invalidated: boolean;
+    reason: string;
+  }> {
+    const response = await this.api.post(`/interviews/professional/${sessionId}/invalidate/`, data);
+    return response.data;
+  }
+
+  async submitInterviewResponse(data: {
+    session_id: number;
+    question_id: number;
+    response_text: string;
+    time_spent: number;
+    audio_recording_url?: string | null;
+  }): Promise<any> {
+    const response = await this.api.post(`/interviews/${data.session_id}/submit_answer/`, {
+      question_id: data.question_id,
+      answer_text: data.response_text,
+      time_taken_seconds: data.time_spent
+    });
+    return response.data;
+  }
+
+  async completeInterviewSession(sessionId: number, data: {
+    actual_duration: number;
+    security_events: any[];
+  }): Promise<InterviewSession> {
+    const response = await this.api.post(`/interviews/${sessionId}/complete_interview/`, {
+      actual_duration: data.actual_duration,
+      security_events: data.security_events
+    });
+    return response.data;
+  }
+
+  async getInterviewResults(sessionId: number): Promise<{
+    session_id: number;
+    status: string;
+    duration: number;
+    responses_count: number;
+    evaluation: any;
+    security_events: any[];
+    completed_at: string;
+  }> {
+    const response = await this.api.get(`/interviews/professional/${sessionId}/results/`);
+    return response.data;
+  }
 }
 
 export const apiService = new ApiService();

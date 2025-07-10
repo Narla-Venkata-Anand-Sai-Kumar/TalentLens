@@ -12,7 +12,7 @@ import { useToast } from '../../hooks';
 
 const InterviewResultsPage: React.FC = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, session_id } = router.query;
   const { isAuthenticated } = useAuth();
   const [session, setSession] = useState<InterviewSession | null>(null);
   const [responses, setResponses] = useState<any[]>([]);
@@ -26,10 +26,12 @@ const InterviewResultsPage: React.FC = () => {
       return;
     }
 
-    if (id && typeof id === 'string') {
-      fetchInterviewResults(parseInt(id, 10));
+    // Handle both 'id' and 'session_id' parameters for compatibility
+    const sessionId = id || session_id;
+    if (sessionId && typeof sessionId === 'string') {
+      fetchInterviewResults(parseInt(sessionId, 10));
     }
-  }, [id, isAuthenticated, router]);
+  }, [id, session_id, isAuthenticated, router]);
 
   const fetchInterviewResults = async (sessionId: number) => {
     try {

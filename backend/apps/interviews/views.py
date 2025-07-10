@@ -49,43 +49,30 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         else:  # student
             return InterviewSession.objects.filter(student=user)
     
-    def perform_create(self, serializer):
-        """Create interview session with teacher assignment and security setup"""
-        if self.request.user.role in ['teacher', 'administrator']:
-            import secrets
-            import hashlib
-            
-            # Generate secure session token
-            session_token = secrets.token_urlsafe(32)
-            session_hash = hashlib.sha256(session_token.encode()).hexdigest()
-            
-            # Set default security config if not provided
-            security_config = serializer.validated_data.get('security_config', {})
-            default_security = {
-                'tab_switch_limit': 3,
-                'warning_limit': 5,
-                'time_extension_allowed': False,
-                'copy_paste_disabled': True,
-                'screen_recording_detection': True
-            }
-            security_config = {**default_security, **security_config}
-            
-            serializer.save(
-                teacher=self.request.user,
-                session_token=session_hash,
-                security_config=security_config,
-                is_session_valid=True
-            )
-        else:
+    def create(self, request, *args, **kwargs):
+        """Create interview session - only teachers can create interviews."""
+        if request.user.role not in ['teacher', 'administrator']:
             return Response(
-                {'error': 'Only teachers and administrators can create interviews'}, 
+                {'error': 'Only teachers can create interviews'}, 
                 status=status.HTTP_403_FORBIDDEN
             )
+        return super().create(request, *args, **kwargs)
+    
+    def perform_create(self, serializer):
+        """Set the teacher when creating an interview."""
+        serializer.save(teacher=self.request.user)
     
     @action(detail=True, methods=['post'])
     def start_interview(self, request, pk=None):
-        """Start an interview session"""
+        """Start an interview session - only students can start interviews."""
         session = self.get_object()
+        
+        # Role check - only students can start interviews
+        if request.user.role != 'student':
+            return Response(
+                {'error': 'Only students can participate in interviews'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         # Security checks
         if request.user != session.student:
@@ -159,8 +146,15 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def submit_answer(self, request, pk=None):
-        """Submit answer to a question"""
+        """Submit answer to a question - only students can submit answers."""
         session = self.get_object()
+        
+        # Role check - only students can submit answers
+        if request.user.role != 'student':
+            return Response(
+                {'error': 'Only students can participate in interviews'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         if request.user != session.student:
             return Response(
@@ -510,9 +504,10 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                         'time_taken_seconds': response.time_taken_seconds,
                         'score': response.score,
                         'ai_feedback': response.ai_feedback,
-                        'expected_answer': question.expected_answer,
+                        'expected_answer_length': question.expected_answer_length,
                         'difficulty_level': question.difficulty_level,
-                        'question_type': question.question_type
+                        'category': question.category,
+                        'evaluation_criteria': question.evaluation_criteria
                     })
                 except InterviewResponse.DoesNotExist:
                     # If no response exists for this question
@@ -523,9 +518,10 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                         'time_taken_seconds': 0,
                         'score': 0,
                         'ai_feedback': None,
-                        'expected_answer': question.expected_answer,
+                        'expected_answer_length': question.expected_answer_length,
                         'difficulty_level': question.difficulty_level,
-                        'question_type': question.question_type
+                        'category': question.category,
+                        'evaluation_criteria': question.evaluation_criteria
                     })
             
             return Response(responses)
