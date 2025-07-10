@@ -53,10 +53,10 @@ const StudentHomePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-accent-50 to-neutral-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-medium">Loading TalentLens...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-accent-600 border-t-transparent mx-auto"></div>
+          <p className="mt-6 text-neutral-600 font-medium text-lg">Loading TalentLens...</p>
         </div>
       </div>
     );
@@ -116,28 +116,30 @@ const StudentHomePage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-accent-50 to-neutral-100">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+      <header className="bg-white/80 backdrop-blur-md shadow-soft sticky top-0 z-50 border-b border-neutral-200/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">TL</span>
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-accent-600 to-accent-700 rounded-xl flex items-center justify-center shadow-medium">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">TalentLens</h1>
-                <p className="text-sm text-gray-500">Student Portal</p>
+                <h1 className="text-2xl font-bold text-neutral-900">TalentLens</h1>
+                <p className="text-sm text-neutral-500">Student Portal</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <Link href="/signin">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="md" className="hover:shadow-medium">
                   Sign In
                 </Button>
               </Link>
-              <div className="hidden sm:block px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg flex items-center">
-                <LightBulbIcon className="w-4 h-4 mr-2" />
+              <div className="hidden sm:flex items-center px-4 py-3 text-sm text-neutral-600 bg-neutral-100 rounded-xl border border-neutral-200">
+                <LightBulbIcon className="w-4 h-4 mr-2 text-warning-600" />
                 Contact your teacher for account creation
               </div>
             </div>

@@ -45,10 +45,10 @@ const ProfessionalInterview: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">
             Loading Interview...
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-neutral-600 dark:text-neutral-300">
             Please wait while we prepare your interview session.
           </p>
         </div>

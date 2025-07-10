@@ -24,23 +24,24 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ...props
   }, ref) => {
     const baseClasses = [
-      'inline-flex items-center justify-center rounded-md font-medium transition-colors',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2',
       'disabled:pointer-events-none disabled:opacity-50',
+      'shadow-soft hover:shadow-medium',
     ];
 
     const variants = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700',
-      secondary: 'bg-gray-600 text-white hover:bg-gray-700',
-      outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-      ghost: 'text-gray-700 hover:bg-gray-100',
-      danger: 'bg-red-600 text-white hover:bg-red-700',
+      primary: 'bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-800 shadow-accent-600/20',
+      secondary: 'bg-neutral-600 text-white hover:bg-neutral-700 active:bg-neutral-800',
+      outline: 'border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400 active:bg-neutral-100',
+      ghost: 'text-neutral-700 hover:bg-neutral-100 active:bg-neutral-200',
+      danger: 'bg-error-600 text-white hover:bg-error-700 active:bg-error-800 shadow-error-600/20',
     };
 
     const sizes = {
-      sm: 'h-8 px-3 text-sm',
-      md: 'h-10 px-4 py-2',
-      lg: 'h-12 px-6 text-lg',
+      sm: 'h-9 px-3 text-sm',
+      md: 'h-11 px-5 py-2.5',
+      lg: 'h-13 px-7 text-lg',
     };
 
     const classes = cn(

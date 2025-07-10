@@ -58,35 +58,42 @@ const DashboardPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-8 animate-fade-in">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
+        <div className="bg-gradient-to-r from-accent-600 to-accent-700 rounded-3xl p-8 text-white shadow-large">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold mb-2">
-                Welcome back, {user?.first_name}!
+              <h1 className="text-3xl font-bold mb-3">
+                Welcome back, {user?.first_name}! 👋
               </h1>
-              <p className="text-blue-100">
+              <p className="text-accent-100 text-lg">
                 {user?.role === 'student' 
-                  ? "Ready to practice your interview skills today?"
+                  ? "Ready to continue your interview preparation journey?"
                   : user?.role === 'teacher'
                   ? "Manage your students and create new interviews."
                   : "Oversee the platform and monitor all activities."
                 }
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={loadDashboardData}
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-              disabled={loading}
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Refresh
-            </Button>
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadDashboardData}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+                disabled={loading}
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </Button>
+              <div className="hidden md:block w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
 
