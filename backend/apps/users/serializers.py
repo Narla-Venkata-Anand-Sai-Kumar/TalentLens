@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'first_name', 'last_name', 
+            'id', 'uuid', 'username', 'email', 'first_name', 'last_name', 
             'full_name', 'role', 'phone_number', 'profile_picture',
             'date_of_birth', 'address', 'has_premium', 'is_active', 'date_joined',
             'password', 'preferences'
@@ -82,4 +82,4 @@ class StudentListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'full_name', 'is_active']
+        fields = ['id', 'uuid', 'username', 'email', 'full_name', 'is_active']

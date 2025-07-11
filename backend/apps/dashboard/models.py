@@ -1,9 +1,13 @@
 from django.db import models
+import uuid
 from django.utils import timezone
 from apps.users.models import User
 
 class DashboardMetrics(models.Model):
     """Model for storing dashboard metrics snapshots"""
+    
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     # Date for the metrics
     date = models.DateField(default=timezone.now)
@@ -39,6 +43,9 @@ class DashboardMetrics(models.Model):
 
 class StudentProgress(models.Model):
     """Model for tracking student progress over time"""
+    
+    # Use UUID as primary key for better security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     student = models.ForeignKey(
         User,
@@ -82,6 +89,9 @@ class StudentProgress(models.Model):
 class TeacherStats(models.Model):
     """Model for teacher performance statistics"""
     
+    # Use UUID as primary key for better security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    
     teacher = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -116,6 +126,9 @@ class TeacherStats(models.Model):
 
 class SystemAlert(models.Model):
     """Model for system alerts and notifications"""
+    
+    # Use UUID as primary key for better security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     ALERT_TYPES = [
         ('info', 'Information'),

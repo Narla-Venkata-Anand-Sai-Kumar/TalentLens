@@ -2,9 +2,13 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from apps.users.models import User
+import uuid
 
 class InterviewSession(models.Model):
     """Model for interview sessions"""
+    
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     INTERVIEW_TYPES = [
         ('technical', 'Technical'),
@@ -127,6 +131,9 @@ class InterviewSession(models.Model):
 class InterviewQuestion(models.Model):
     """Model for interview questions"""
     
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    
     session = models.ForeignKey(
         InterviewSession, 
         on_delete=models.CASCADE, 
@@ -168,6 +175,9 @@ class InterviewQuestion(models.Model):
 class InterviewResponse(models.Model):
     """Model for interview responses"""
     
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    
     question = models.OneToOneField(
         InterviewQuestion, 
         on_delete=models.CASCADE, 
@@ -200,6 +210,9 @@ class InterviewResponse(models.Model):
 class InterviewFeedback(models.Model):
     """Model for overall interview feedback"""
     
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    
     session = models.OneToOneField(
         InterviewSession,
         on_delete=models.CASCADE,
@@ -225,6 +238,9 @@ class InterviewFeedback(models.Model):
 
 class InterviewAnalytics(models.Model):
     """Model for storing interview analytics"""
+    
+    # Use UUID as primary key for better security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     session = models.OneToOneField(
         InterviewSession,

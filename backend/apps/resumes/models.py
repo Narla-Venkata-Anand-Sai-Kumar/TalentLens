@@ -1,8 +1,12 @@
 from django.db import models
+import uuid
 from apps.users.models import User
 
 class Resume(models.Model):
     """Model for storing student resumes"""
+    
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     student = models.OneToOneField(
         User, 
@@ -54,6 +58,9 @@ class Resume(models.Model):
 class ResumeAnalysis(models.Model):
     """Model for storing AI analysis of resumes"""
     
+    # Default id field (auto-incrementing primary key)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    
     resume = models.OneToOneField(
         Resume,
         on_delete=models.CASCADE,
@@ -90,6 +97,9 @@ class ResumeAnalysis(models.Model):
 
 class ResumeVersion(models.Model):
     """Model for storing resume versions/history"""
+    
+    # Default id field (auto-incrementing primary key)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     resume = models.ForeignKey(
         Resume,

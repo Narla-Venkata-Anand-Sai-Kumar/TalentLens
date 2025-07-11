@@ -95,6 +95,7 @@ class TokenResponseSerializer(serializers.Serializer):
         user = obj.get('user')
         return {
             'id': user.id,
+            'uuid': str(user.uuid) if user.uuid else None,
             'username': user.username,
             'email': user.email,
             'first_name': user.first_name,

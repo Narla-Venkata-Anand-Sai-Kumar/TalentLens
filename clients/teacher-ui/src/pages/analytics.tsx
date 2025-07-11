@@ -280,9 +280,9 @@ const AnalyticsPage: React.FC = () => {
                   onChange={(e) => setSelectedPeriod(e.target.value)}
                   className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
                 >
-                  <option value="7d">📅 Last 7 days</option>
-                  <option value="30d">📅 Last 30 days</option>
-                  <option value="90d">📅 Last 3 months</option>
+                  <option value="7d">Last 7 days</option>
+                  <option value="30d">Last 30 days</option>
+                  <option value="90d">Last 3 months</option>
                 </select>
                 
                 <select
@@ -290,10 +290,10 @@ const AnalyticsPage: React.FC = () => {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
                 >
-                  <option value="all">🎯 All Categories</option>
-                  <option value="technical">💻 Technical</option>
-                  <option value="communication">💬 Communication</option>
-                  <option value="aptitude">🧠 Aptitude</option>
+                  <option value="all">All Categories</option>
+                                      <option value="technical">Technical</option>
+                    <option value="communication">Communication</option>
+                    <option value="aptitude">Aptitude</option>
                 </select>
               </div>
               
@@ -309,6 +309,27 @@ const AnalyticsPage: React.FC = () => {
                 Refresh
               </Button>
             </div>
+          </div>
+        </div>
+
+        {/* Modernized Filter/Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Comprehensive insights into student performance and progress tracking</h1>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1 shadow-sm">
+              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              <span className="text-sm font-medium text-gray-700">Last 30 days</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1 shadow-sm">
+              <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" /></svg>
+              <span className="text-sm font-medium text-gray-700">All Categories</span>
+            </div>
+            <button onClick={() => fetchAnalyticsData()} className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg shadow transition-all duration-150">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582M20 20v-5h-.581M5.21 17.293A9 9 0 0021 12.082M18.79 6.707A9 9 0 003 11.918" /></svg>
+              <span className="hidden md:inline">Refresh</span>
+            </button>
           </div>
         </div>
 

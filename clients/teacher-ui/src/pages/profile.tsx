@@ -7,6 +7,7 @@ import { apiService } from '../utils/api';
 import { User } from '../types';
 import { formatDate } from '../utils/helpers';
 import { useFormStyles, useTextStyles } from '../utils/formStyles';
+import { createDisplayID } from '../utils/uuidUtils';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Loading from '../components/ui/Loading';
@@ -1022,7 +1023,7 @@ const ProfilePage: React.FC = () => {
                     <span className="text-sm font-semibold text-gray-700">User ID</span>
                   </div>
                   <span className="text-sm font-bold text-gray-900">
-                    #{user.id}
+                    {createDisplayID(user.uuid || user.id, 'user')}
                   </span>
                 </div>
 
