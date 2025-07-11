@@ -4,6 +4,7 @@ import Layout from '../components/Layout';
 import { useAuth } from '../contexts/AuthContext';
 import { User } from '../types';
 import { formatDate } from '../utils/helpers';
+import { createDisplayID } from '../utils/uuidUtils';
 import Button from '../components/ui/Button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../components/ui/Card';
 import Loading from '../components/ui/Loading';
@@ -192,29 +193,48 @@ const ProfilePage: React.FC = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="text-center">
-          <div className="mx-auto w-32 h-32 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mb-6 shadow-lg">
-            <UserIcon className="w-16 h-16 text-white" />
+        {/* Enhanced Header */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-3xl p-8 text-white shadow-2xl">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+          
+          <div className="relative text-center">
+            <div className="mx-auto w-32 h-32 bg-white/20 rounded-full flex items-center justify-center mb-6 shadow-2xl backdrop-blur-sm border-4 border-white/30">
+              <UserIcon className="w-16 h-16 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold mb-3">
+              {user.first_name} {user.last_name}
+            </h1>
+            <div className="flex justify-center items-center space-x-4 mb-6">
+              <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-white/20 backdrop-blur-sm border border-white/30">
+                <IdentificationIcon className="w-4 h-4 mr-2" />
+                {getRoleDisplay(user.role)}
+              </span>
+              <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm border ${
+                user.is_active ? 'bg-green-500/20 text-green-100 border-green-300/30' : 'bg-red-500/20 text-red-100 border-red-300/30'
+              }`}>
+                <ShieldCheckIcon className="w-3 h-3 mr-1" />
+                {user.is_active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+            <p className="text-emerald-100 max-w-2xl mx-auto text-lg font-medium">
+              {user.profile?.bio || 'Welcome to your profile! Add a bio to tell others about yourself.'}
+            </p>
+            
+            {/* Quick Stats Row */}
+            <div className="flex flex-wrap justify-center gap-4 mt-8">
+              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2 backdrop-blur-sm">
+                <CalendarIcon className="w-4 h-4 text-emerald-200" />
+                <span className="text-sm font-medium">Member since: {formatDate(user.date_joined)}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/10 rounded-lg px-4 py-2 backdrop-blur-sm">
+                <ChartBarIcon className="w-4 h-4 text-emerald-200" />
+                <span className="text-sm font-medium">Last activity: {formatDate(new Date().toISOString())}</span>
+              </div>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            {user.first_name} {user.last_name}
-          </h1>
-          <div className="flex justify-center items-center space-x-4 mb-4">
-            <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${getRoleBadgeColor(user.role)}`}>
-              <IdentificationIcon className="w-4 h-4 mr-2" />
-              {getRoleDisplay(user.role)}
-            </span>
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-              user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            }`}>
-              <ShieldCheckIcon className="w-3 h-3 mr-1" />
-              {user.is_active ? 'Active' : 'Inactive'}
-            </span>
-          </div>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            {user.profile?.bio || 'Welcome to your profile! Add a bio to tell others about yourself.'}
-          </p>
         </div>
 
         {/* Profile Statistics */}
@@ -232,13 +252,17 @@ const ProfilePage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Information */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <UserIcon className="w-5 h-5 text-primary-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Profile Information</h3>
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50/50">
+              <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+                    <UserIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">Profile Information</h3>
+                    <p className="text-sm text-gray-600">Update your personal information and bio</p>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Update your personal information and bio</p>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -252,7 +276,7 @@ const ProfilePage: React.FC = () => {
                         type="text"
                         value={formData.first_name}
                         onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:border-emerald-300"
                         required
                       />
                     </div>
@@ -266,7 +290,7 @@ const ProfilePage: React.FC = () => {
                         type="text"
                         value={formData.last_name}
                         onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:border-emerald-300"
                         required
                       />
                     </div>
@@ -280,7 +304,7 @@ const ProfilePage: React.FC = () => {
                     <input
                       type="email"
                       value={formData.email}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-500"
                       disabled
                     />
                     <p className="text-xs text-gray-500 mt-2 flex items-center">
@@ -298,7 +322,7 @@ const ProfilePage: React.FC = () => {
                       type="tel"
                       value={formData.phone_number}
                       onChange={(e) => setFormData(prev => ({ ...prev, phone_number: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:border-emerald-300"
                       placeholder="Enter your phone number"
                     />
                   </div>
@@ -312,16 +336,16 @@ const ProfilePage: React.FC = () => {
                       value={formData.bio}
                       onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:border-emerald-300"
                       placeholder="Tell us about yourself, your goals, and what you're passionate about..."
                     />
                   </div>
 
-                  <div className="flex justify-end pt-4 border-t border-gray-200">
+                  <div className="flex justify-end pt-6 border-t border-gray-200">
                     <Button
                       type="submit"
                       isLoading={loading}
-                      className="px-6 py-3"
+                      className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       Save Changes
                     </Button>
@@ -465,7 +489,7 @@ const ProfilePage: React.FC = () => {
                       User ID
                     </label>
                     <p className="text-sm text-gray-900 font-mono">
-                      #{user.id}
+                      {createDisplayID(user.uuid || user.id, 'user')}
                     </p>
                   </div>
 

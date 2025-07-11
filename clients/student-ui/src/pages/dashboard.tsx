@@ -59,28 +59,59 @@ const DashboardPage: React.FC = () => {
   return (
     <Layout>
       <div className="space-y-8 animate-fade-in">
-        {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl p-8 text-white shadow-xl">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold mb-3">
-                Welcome back, {user?.first_name}! 👋
-              </h1>
-              <p className="text-emerald-100 text-lg">
-                {user?.role === 'student' 
-                  ? "Ready to continue your interview preparation journey?"
-                  : user?.role === 'teacher'
-                  ? "Manage your students and create new interviews."
-                  : "Oversee the platform and monitor all activities."
-                }
-              </p>
+        {/* Enhanced Welcome Section */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-3xl p-8 text-white shadow-2xl">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+          
+          <div className="relative flex justify-between items-center">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">
+                    Welcome back, {user?.first_name}!
+                  </h1>
+                  <p className="text-emerald-100 text-lg font-medium">
+                    {user?.role === 'student' 
+                      ? "Ready to continue your interview preparation journey?"
+                      : user?.role === 'teacher'
+                      ? "Manage your students and create new interviews."
+                      : "Oversee the platform and monitor all activities."
+                    }
+                  </p>
+                </div>
+              </div>
+              
+              {/* Quick Stats Row */}
+              <div className="flex flex-wrap gap-4 mt-6">
+                <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2 backdrop-blur-sm">
+                  <svg className="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-sm font-medium">Today: {new Date().toLocaleDateString()}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2 backdrop-blur-sm">
+                  <svg className="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm font-medium">Last login: {formatDate(user?.last_login || new Date().toISOString())}</span>
+                </div>
+              </div>
             </div>
+            
             <div className="flex items-center space-x-4">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={loadDashboardData}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-200 hover:scale-105"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-200 hover:scale-105 shadow-lg"
                 disabled={loading}
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +119,7 @@ const DashboardPage: React.FC = () => {
                 </svg>
                 Refresh
               </Button>
-              <div className="hidden md:block w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">
+              <div className="hidden md:block w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-lg">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -371,8 +402,10 @@ const DashboardPage: React.FC = () => {
                   <div className="space-y-3">
                     {stats.achievements.slice(0, 3).map((achievement, index) => (
                       <div key={index} className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                          <span className="text-sm">🏆</span>
+                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                          </svg>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-gray-900 font-medium">{achievement.title}</p>
@@ -407,30 +440,58 @@ interface StatsCardProps {
 
 const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, change, changeType, onClick }) => {
   const changeColors = {
-    positive: 'text-emerald-600 bg-emerald-100',
-    negative: 'text-red-600 bg-red-100',
-    neutral: 'text-gray-600 bg-gray-100',
+    positive: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+    negative: 'text-red-600 bg-red-50 border-red-200',
+    neutral: 'text-gray-600 bg-gray-50 border-gray-200',
+  };
+
+  const changeIcons = {
+    positive: (
+      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l9.2-9.2M17 17V7H7" />
+      </svg>
+    ),
+    negative: (
+      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7l-9.2 9.2M7 7v10h10" />
+      </svg>
+    ),
+    neutral: (
+      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+      </svg>
+    ),
   };
 
   return (
-    <Card className={`hover:shadow-xl transition-all duration-200 hover:scale-105 ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
+    <Card className={`group hover:shadow-2xl transition-all duration-300 hover:scale-105 border-0 bg-gradient-to-br from-white to-gray-50/50 ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl">
+            <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
               {icon}
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">{title}</p>
-              <p className="text-2xl font-bold text-gray-900">{value}</p>
+              <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+              <p className="text-3xl font-bold text-gray-900">{value}</p>
             </div>
           </div>
-          <div className={`px-2 py-1 rounded-full text-xs font-medium ${changeColors[changeType]}`}>
-            {changeType === 'positive' && '↗'}
-            {changeType === 'negative' && '↘'}
-            {changeType === 'neutral' && '→'}
-            {change}
+          <div className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border ${changeColors[changeType]} transition-all duration-200`}>
+            {changeIcons[changeType]}
+            <span>{change}</span>
           </div>
+        </div>
+        
+        {/* Progress Bar for visual appeal */}
+        <div className="mt-4 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+          <div 
+            className={`h-full rounded-full transition-all duration-500 ${
+              changeType === 'positive' ? 'bg-gradient-to-r from-emerald-400 to-emerald-600' :
+              changeType === 'negative' ? 'bg-gradient-to-r from-red-400 to-red-600' :
+              'bg-gradient-to-r from-gray-400 to-gray-600'
+            }`}
+            style={{ width: `${Math.min(100, Math.max(0, parseFloat(change.toString()) || 0))}%` }}
+          ></div>
         </div>
       </CardContent>
     </Card>
@@ -446,15 +507,15 @@ const InterviewItem: React.FC<InterviewItemProps> = ({ interview }) => {
   
   const getStatusBadge = (status: string) => {
     const colors = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      in_progress: 'bg-blue-100 text-blue-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800',
-      scheduled: 'bg-blue-100 text-blue-800',
+      pending: 'bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200',
+      in_progress: 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200',
+      completed: 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200',
+      cancelled: 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200',
+      scheduled: 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border border-blue-200',
     };
 
     return (
-      <span className={`px-2 py-1 text-xs rounded-full ${colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`px-3 py-1.5 text-xs font-semibold rounded-full shadow-sm ${colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800 border border-gray-200'}`}>
         {status.replace('_', ' ').toUpperCase()}
       </span>
     );
@@ -521,8 +582,8 @@ const InterviewItem: React.FC<InterviewItemProps> = ({ interview }) => {
 
   return (
     <div 
-      className={`flex items-center justify-between p-4 border border-gray-200 rounded-lg transition-colors ${
-        isClickable ? 'hover:bg-gray-50 cursor-pointer' : 'cursor-default'
+      className={`group flex items-center justify-between p-6 border border-gray-200 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-lg ${
+        isClickable ? 'hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 cursor-pointer hover:border-emerald-200' : 'cursor-default'
       }`}
       onClick={isClickable ? handleClick : undefined}
     >
@@ -555,9 +616,11 @@ const InterviewItem: React.FC<InterviewItemProps> = ({ interview }) => {
       <div className="flex-shrink-0 ml-4 flex items-center space-x-2">
         {getStatusBadge(interview.status)}
         {isClickable && (
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+          <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-200 shadow-md">
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         )}
       </div>
     </div>
@@ -572,3 +635,4 @@ export const getServerSideProps = async () => {
     props: {},
   };
 };
+
