@@ -259,7 +259,7 @@ const DashboardPage: React.FC = () => {
                       variant="primary"
                       onClick={() => router.push('/interviews/new')}
                     >
-                      Create Interview
+                      Create Professional Interview
                     </Button>
                     <Button 
                       fullWidth 

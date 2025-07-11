@@ -1003,10 +1003,17 @@ const ProfessionalInterviewSession: React.FC<ProfessionalInterviewSessionProps> 
                 }`}>
                   {currentAnswer.length} characters
                 </span>
-                <span className={`text-sm ${
+                <span className={`text-sm flex items-center ${
                   currentAnswer.trim() ? 'text-green-600' : isDark ? 'text-gray-400' : 'text-gray-500'
                 }`}>
-                  {currentAnswer.trim() ? '✓ Answer provided' : 'No answer yet'}
+                  {currentAnswer.trim() ? (
+                    <>
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Answer provided
+                    </>
+                  ) : 'No answer yet'}
                 </span>
               </div>
             </div>
