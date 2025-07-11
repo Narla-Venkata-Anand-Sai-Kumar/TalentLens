@@ -1433,56 +1433,89 @@ const StudentsPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className={`text-3xl font-bold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Manage Students</h1>
-            <p className="mt-2 text-gray-600">
-              Comprehensive student management with progress tracking and resume management
-            </p>
-          </div>
-          <div className="flex space-x-3">
-            <Button 
-              onClick={() => {
-                setSelectedStudent(null);
-                setScheduleInterviewModalOpen(true);
-              }}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Schedule Interview(s)
-            </Button>
-            <Button 
-              onClick={() => {
-                setSelectedStudent(null);
-                setModalOpen(true);
-              }}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              Add New Student
-            </Button>
+        <div className="relative bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-2xl p-8 text-white overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 to-teal-600/90 backdrop-blur-sm"></div>
+          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10 flex justify-between items-center">
+            <div className="flex-1">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">
+                    Student Management
+                  </h1>
+                  <p className="text-emerald-100 text-lg">
+                    Comprehensive student management with progress tracking and resume management
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex space-x-4">
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setSelectedStudent(null);
+                  setScheduleInterviewModalOpen(true);
+                }}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-200 hover:scale-105"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Schedule Interview(s)
+              </Button>
+              <Button 
+                variant="gradient"
+                onClick={() => {
+                  setSelectedStudent(null);
+                  setModalOpen(true);
+                }}
+                className="bg-white text-emerald-600 hover:bg-white/90 font-semibold shadow-lg transition-all duration-200 hover:scale-105"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Add New Student
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Filters */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
+        <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row gap-6">
               <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search students by name or email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search students by name or email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white hover:border-gray-400"
+                  />
+                </div>
               </div>
               
-              <div className="flex space-x-3">
+              <div className="flex space-x-4">
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white hover:border-gray-400"
                 >
                   <option value="all">All Students</option>
                   <option value="active">Active Only</option>
@@ -1492,7 +1525,7 @@ const StudentsPage: React.FC = () => {
                 <select
                   value={resumeFilter}
                   onChange={(e) => setResumeFilter(e.target.value as 'all' | 'with_resume' | 'without_resume')}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white hover:border-gray-400"
                 >
                   <option value="all">All Resumes</option>
                   <option value="with_resume">With Resume</option>
@@ -1531,30 +1564,35 @@ const StudentsPage: React.FC = () => {
             )}
           </Card>
         ) : (
-          <div className="space-y-4">
-            {filteredStudents.map((student) => (
-              <Card key={student.id} className="hover:shadow-md transition-shadow">
+          <div className="space-y-6">
+            {filteredStudents.map((student, index) => (
+              <Card 
+                key={student.id} 
+                variant="elevated"
+                className="group hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-l-4 border-l-emerald-500"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     {/* Student Info */}
                     <div className="flex items-start space-x-4 flex-1">
                       <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
-                          <span className="text-emerald-600 font-medium text-lg">
+                        <div className="w-14 h-14 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <span className="text-white font-bold text-lg">
                             {student.first_name.charAt(0)}{student.last_name.charAt(0)}
                           </span>
                         </div>
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-medium text-gray-900">
+                        <div className="flex items-center space-x-3 mb-3">
+                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-emerald-700 transition-colors duration-200">
                             {student.first_name} {student.last_name}
                           </h3>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                             student.is_active 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
+                              ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200' 
+                              : 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200'
                           }`}>
                             {student.is_active ? 'Active' : 'Inactive'}
                           </span>
@@ -1711,37 +1749,39 @@ const StudentsPage: React.FC = () => {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
+          <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                     </svg>
                   </div>
                 </div>
-                <div className="ml-5">
-                  <p className="text-sm font-medium text-gray-500">Total Students</p>
-                  <p className="text-2xl font-semibold text-gray-900">{students.length}</p>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Students</p>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                    {students.length}
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                 </div>
-                <div className="ml-5">
-                  <p className="text-sm font-medium text-gray-500">Active Students</p>
-                  <p className="text-2xl font-semibold text-gray-900">
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Active Students</p>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                     {students.filter(s => s.is_active).length}
                   </p>
                 </div>
@@ -1749,19 +1789,19 @@ const StudentsPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
                 </div>
-                <div className="ml-5">
-                  <p className="text-sm font-medium text-gray-500">With Resumes</p>
-                  <p className="text-2xl font-semibold text-gray-900">
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">With Resumes</p>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                     {students.filter(s => s.hasResume).length}
                   </p>
                 </div>
@@ -1769,19 +1809,19 @@ const StudentsPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
                 </div>
-                <div className="ml-5">
-                  <p className="text-sm font-medium text-gray-500">Avg Progress</p>
-                  <p className="text-2xl font-semibold text-gray-900">
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Avg Progress</p>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     {students.length > 0 
                       ? Math.round(students.reduce((acc, s) => acc + s.progressPercentage, 0) / students.length)
                       : 0
