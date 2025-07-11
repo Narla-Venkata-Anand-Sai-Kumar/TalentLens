@@ -108,6 +108,24 @@ class UserViewSet(viewsets.ModelViewSet):
         teachers = User.objects.filter(role='teacher').order_by('first_name', 'last_name', 'username')
         serializer = StudentListSerializer(teachers, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def student_limit_info(self, request):
+        """Get student limit information for teachers"""
+        if request.user.role != 'teacher':
+            return Response(
+                {'error': 'Only teachers can view student limit information'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        user = request.user
+        return Response({
+            'current_student_count': user.current_student_count,
+            'student_limit': 3 if not user.has_premium else None,
+            'has_premium': user.has_premium,
+            'can_add_student': user.can_add_student(),
+            'message': 'Premium account - unlimited students' if user.has_premium else f'Free account - {user.current_student_count}/3 students used'
+        })
 
     @action(detail=False, methods=['post'])
     def create_student(self, request):
@@ -115,6 +133,20 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.user.role != 'teacher':
             return Response(
                 {'error': 'Only teachers can create student accounts'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Check if teacher can add more students (premium feature flag)
+        if not request.user.can_add_student():
+            current_count = request.user.current_student_count
+            return Response(
+                {
+                    'error': 'Student limit reached', 
+                    'message': f'You currently have {current_count} students. Free accounts are limited to 3 students. Upgrade to Premium to add unlimited students.',
+                    'current_student_count': current_count,
+                    'student_limit': 3,
+                    'has_premium': request.user.has_premium
+                }, 
                 status=status.HTTP_403_FORBIDDEN
             )
         

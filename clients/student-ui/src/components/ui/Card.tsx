@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../utils/helpers';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'outlined';
@@ -8,10 +9,18 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', padding = 'md', children, ...props }, ref) => {
+    const { isDark } = useTheme();
+    
     const variants = {
-      default: 'bg-white border border-neutral-200 shadow-soft',
-      elevated: 'bg-white shadow-medium border border-neutral-100',
-      outlined: 'bg-white border-2 border-neutral-300',
+      default: isDark 
+        ? 'bg-gray-800 border border-gray-700' 
+        : 'bg-white border border-gray-200',
+      elevated: isDark 
+        ? 'bg-gray-800 shadow-lg border border-gray-600' 
+        : 'bg-white shadow-lg border border-gray-100',
+      outlined: isDark 
+        ? 'bg-gray-800 border-2 border-gray-600' 
+        : 'bg-white border-2 border-gray-300',
     };
 
     const paddings = {
@@ -25,7 +34,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'rounded-2xl transition-all duration-200 hover:shadow-medium',
+          'rounded-lg',
           variants[variant],
           paddings[padding],
           className

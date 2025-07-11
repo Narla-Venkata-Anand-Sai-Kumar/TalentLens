@@ -24,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 
             'full_name', 'role', 'phone_number', 'profile_picture',
-            'date_of_birth', 'address', 'is_active', 'date_joined',
+            'date_of_birth', 'address', 'has_premium', 'is_active', 'date_joined',
             'password', 'preferences'
         ]
         extra_kwargs = {

@@ -11,6 +11,7 @@ export interface User {
   phone_number?: string;
   profile_picture?: string;
   full_name?: string;
+  has_premium?: boolean;
   profile?: {
     bio?: string;
     phone_number?: string;

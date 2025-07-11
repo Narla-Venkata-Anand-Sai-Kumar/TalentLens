@@ -46,10 +46,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Show loading state during auth check or redirect
   if (loading || redirecting) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-emerald-200 border-t-emerald-600 mx-auto"></div>
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 opacity-20 animate-pulse"></div>
+          </div>
+          <p className="mt-6 text-gray-600 font-medium">Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -128,18 +131,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 
   return (
-    <div className={cn("min-h-screen", isDark ? "bg-gray-900" : "bg-gray-50")}>
+    <div className={cn("min-h-screen", isDark ? "bg-gray-900" : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50")}>
       {/* Mobile sidebar */}
       <div className={cn(
-        'fixed inset-0 flex z-40 md:hidden',
-        sidebarOpen ? 'block' : 'hidden'
+        'fixed inset-0 flex z-40 md:hidden transition-all duration-300 ease-in-out',
+        sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       )}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-        <div className={cn("relative flex-1 flex flex-col max-w-xs w-full", isDark ? "bg-gray-800" : "bg-white")}>
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+        <div className={cn("relative flex-1 flex flex-col max-w-xs w-full transform transition-transform duration-300 ease-in-out", 
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          isDark ? "bg-gray-800" : "bg-white"
+        )}>
           <div className="absolute top-0 right-0 -mr-12 pt-2">
             <button
               onClick={() => setSidebarOpen(false)}
-              className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white hover:bg-gray-600 transition-colors"
             >
               <svg className="h-6 w-6 text-white" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -158,12 +164,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main content */}
       <div className="md:pl-64 flex flex-col flex-1">
         {/* Top bar */}
-        <div className={cn("sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3", isDark ? "bg-gray-900" : "bg-gray-50")}>
+        <div className={cn("sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3", isDark ? "bg-gray-900" : "bg-gradient-to-r from-slate-50 to-blue-50")}>
           <button
             onClick={() => setSidebarOpen(true)}
             className={cn(
-              "-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500",
-              isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-900"
+              "-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 hover:scale-105",
+              isDark ? "text-gray-400 hover:text-gray-200 hover:bg-gray-800" : "text-gray-500 hover:text-gray-900 hover:bg-white/60 backdrop-blur-sm"
             )}
           >
             <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -173,20 +179,28 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* Header */}
-        <header className={cn("shadow", isDark ? "bg-gray-800" : "bg-white")}>
+        <header className={cn("shadow-sm backdrop-blur-md", isDark ? "bg-gray-800/95" : "bg-white/80")}>
           <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
-              <h1 className={cn("text-3xl font-bold", isDark ? "text-gray-100" : "text-gray-900")}>
-                {getPageTitle(router.pathname)}
-              </h1>
+              <div className="flex items-center space-x-4">
+                <h1 className={cn("text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent", 
+                  isDark ? "from-emerald-400 to-teal-400" : "from-emerald-600 to-teal-600"
+                )}>
+                  {getPageTitle(router.pathname)}
+                </h1>
+                {/* Subtle upgrade hint */}
+                <span className="hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border border-purple-200">
+                  ✨ Pro Features Available
+                </span>
+              </div>
               
               <div className="flex items-center space-x-4">
                 {/* Theme Toggle */}
                 <button
                   onClick={toggleTheme}
                   className={cn(
-                    "p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500",
-                    isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-500"
+                    "p-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 hover:scale-105",
+                    isDark ? "text-gray-400 hover:text-gray-200 hover:bg-gray-700" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                   )}
                   title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
                 >
@@ -203,27 +217,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Notifications */}
                 <button
-                  type="button"
-                  className={cn(
-                    "relative p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500",
-                    isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-500"
-                  )}
                   onClick={() => setNotificationCenterOpen(true)}
+                  className={cn(
+                    "relative p-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 hover:scale-105",
+                    isDark ? "text-gray-400 hover:text-gray-200 hover:bg-gray-700" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                  )}
+                  title="View notifications"
                 >
-                  <span className="sr-only">View notifications</span>
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
                   {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white" />
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-red-400 to-pink-400 text-xs font-bold text-white animate-pulse">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
                   )}
                 </button>
 
-                {/* Profile dropdown */}
+                {/* Profile */}
                 <div className="relative">
-                  <Link href="/profile" className={cn("flex items-center space-x-3 rounded-lg p-2 transition-colors", isDark ? "hover:bg-gray-700" : "hover:bg-gray-50")}>
+                  <Link href="/profile" className={cn("flex items-center space-x-3 rounded-xl p-2 transition-all duration-200 hover:scale-105", 
+                    isDark ? "hover:bg-gray-700" : "hover:bg-gray-100"
+                  )}>
                     <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-emerald-500 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
                         <span className="text-sm font-medium text-white">
                           {user?.first_name && user?.last_name 
                             ? `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`
@@ -250,8 +267,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        <main className={cn("flex-1", isDark ? "bg-gray-900" : "bg-gray-50")}>
-          <div className="py-6">
+        <main className={cn("flex-1 transition-all duration-300", isDark ? "bg-gray-900" : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50")}>
+          <div className="py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               {children}
             </div>
@@ -294,15 +311,29 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
 
   return (
     <>
-      <div className={cn("flex-1 flex flex-col min-h-0 border-r", isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200")}>
+      <div className={cn("flex-1 flex flex-col min-h-0 border-r backdrop-blur-md", 
+        isDark ? "bg-gray-800/95 border-gray-700" : "bg-white/80 border-gray-200"
+      )}>
         <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-          <div className="flex items-center flex-shrink-0 px-4">
-            <h2 className="text-xl font-bold text-emerald-600">
-              TalentLens
-            </h2>
+          {/* Logo */}
+          <div className="flex items-center flex-shrink-0 px-4 mb-8">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">T</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  TalentLens
+                </h2>
+                <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-500")}>
+                  Teacher Portal
+                </p>
+              </div>
+            </div>
           </div>
           
-          <nav className={cn("mt-8 flex-1 px-2 space-y-1", isDark ? "bg-gray-800" : "bg-white")}>
+          {/* Navigation */}
+          <nav className={cn("mt-2 flex-1 px-3 space-y-2", isDark ? "bg-gray-800" : "bg-white")}>
             {navigation.map((item) => {
               const isActive = router.pathname === item.href;
               return (
@@ -310,59 +341,81 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
                   key={item.name}
                   href={item.href}
                   className={cn(
+                    "group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:scale-105",
                     isActive
-                      ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-100'
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
                       : isDark 
-                        ? 'text-gray-300 hover:bg-gray-700 hover:text-gray-100'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                    'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
+                        ? 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                   )}
                 >
                   <span className={cn(
-                    isActive 
-                      ? 'text-emerald-500' 
-                      : isDark 
-                        ? 'text-gray-400 group-hover:text-gray-300'
-                        : 'text-gray-400 group-hover:text-gray-500',
-                    'mr-3 flex-shrink-0'
+                    "mr-3 flex-shrink-0 transition-all duration-200",
+                    isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-500'
                   )}>
                     {item.icon}
                   </span>
-                  {item.name}
+                  <span className="flex-1">{item.name}</span>
+                  {isActive && (
+                    <span className="ml-3 h-2 w-2 bg-white rounded-full animate-pulse"></span>
+                  )}
                 </Link>
               );
             })}
           </nav>
-        </div>
 
-        <div className={cn("flex-shrink-0 flex border-t p-4", isDark ? "border-gray-700" : "border-gray-200")}>
-          <div className="flex items-center w-full">
-            <Link href="/profile" className={cn("flex items-center w-full rounded-md p-2 -m-2 transition-colors", isDark ? "hover:bg-gray-700" : "hover:bg-gray-50")}>
-              <div className="flex-shrink-0">
-                <div className="h-10 w-10 rounded-full bg-emerald-500 flex items-center justify-center">
-                  <span className="text-sm font-medium text-white">
-                    {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
-                  </span>
-                </div>
+          {/* Upgrade CTA */}
+          <div className="mt-6 px-3">
+            <div className={cn("rounded-xl p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white")}>
+              <div className="flex items-center mb-2">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span className="text-sm font-semibold">Upgrade to Pro</span>
               </div>
-              <div className="ml-3 flex-1">
-                <p className={cn("text-sm font-medium", isDark ? "text-gray-200 group-hover:text-gray-100" : "text-gray-700 group-hover:text-gray-900")}>
-                  {user?.first_name} {user?.last_name}
-                </p>
-                <p className={cn("text-xs", isDark ? "text-gray-400" : "text-gray-500")}>View Profile</p>
+              <p className="text-xs text-white/80 mb-3">
+                Unlock advanced analytics, unlimited students, and premium features
+              </p>
+              <button className="w-full bg-white/20 hover:bg-white/30 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors backdrop-blur-sm">
+                Learn More
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* User Profile Section */}
+        <div className={cn("flex-shrink-0 border-t p-4", isDark ? "border-gray-700" : "border-gray-200")}>
+          <div className="flex items-center space-x-3">
+            <div className="flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
+                <span className="text-sm font-medium text-white">
+                  {user?.first_name && user?.last_name 
+                    ? `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`
+                    : user?.email?.charAt(0)?.toUpperCase() || 'U'
+                  }
+                </span>
               </div>
-            </Link>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className={cn("text-sm font-medium truncate", isDark ? "text-gray-200" : "text-gray-800")}>
+                {user?.first_name && user?.last_name 
+                  ? `${user.first_name} ${user.last_name}`
+                  : user?.email || 'Loading...'
+                }
+              </div>
+              <div className={cn("text-xs truncate", isDark ? "text-gray-400" : "text-gray-500")}>
+                {user?.email}
+              </div>
+            </div>
             <button
               onClick={handleLogout}
               className={cn(
-                "ml-2 p-1 rounded-md transition-colors",
-                isDark 
-                  ? "text-gray-400 hover:text-gray-200 hover:bg-gray-700" 
-                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                "p-2 rounded-lg transition-colors hover:scale-105",
+                isDark ? "text-gray-400 hover:text-gray-200 hover:bg-gray-700" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
               )}
               title="Sign out"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
             </button>
@@ -374,16 +427,17 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ navigation, user }) => 
 };
 
 function getPageTitle(pathname: string): string {
-  const titles: { [key: string]: string } = {
+  const routes: Record<string, string> = {
     '/dashboard': 'Dashboard',
     '/interviews': 'Interviews',
     '/resumes': 'Resumes',
-    '/students': 'Manage Students',
+    '/students': 'Students',
     '/analytics': 'Analytics',
     '/profile': 'Profile',
+    '/settings': 'Settings',
   };
 
-  return titles[pathname] || 'TalentLens';
+  return routes[pathname] || 'TalentLens';
 }
 
 export default Layout;

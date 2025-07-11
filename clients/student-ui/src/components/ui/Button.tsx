@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../utils/helpers';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'gradient';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
@@ -24,24 +24,26 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ...props
   }, ref) => {
     const baseClasses = [
-      'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2',
+      'inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-200',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
       'disabled:pointer-events-none disabled:opacity-50',
-      'shadow-soft hover:shadow-medium',
+      'active:scale-95 transform hover:scale-105',
+      'shadow-sm hover:shadow-md',
     ];
 
     const variants = {
-      primary: 'bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-800 shadow-accent-600/20',
-      secondary: 'bg-neutral-600 text-white hover:bg-neutral-700 active:bg-neutral-800',
-      outline: 'border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400 active:bg-neutral-100',
-      ghost: 'text-neutral-700 hover:bg-neutral-100 active:bg-neutral-200',
-      danger: 'bg-error-600 text-white hover:bg-error-700 active:bg-error-800 shadow-error-600/20',
+      primary: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200 hover:shadow-emerald-300',
+      secondary: 'bg-gray-600 text-white hover:bg-gray-700 shadow-gray-200 hover:shadow-gray-300',
+      outline: 'border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400',
+      ghost: 'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
+      danger: 'bg-red-600 text-white hover:bg-red-700 shadow-red-200 hover:shadow-red-300',
+      gradient: 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow-emerald-200 hover:shadow-emerald-300',
     };
 
     const sizes = {
-      sm: 'h-9 px-3 text-sm',
-      md: 'h-11 px-5 py-2.5',
-      lg: 'h-13 px-7 text-lg',
+      sm: 'h-9 px-4 text-sm',
+      md: 'h-11 px-6 py-2 text-base',
+      lg: 'h-13 px-8 text-lg',
     };
 
     const classes = cn(

@@ -15,6 +15,7 @@ class User(AbstractUser):
     profile_picture = models.TextField(blank=True)  # Base64 encoded
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.TextField(blank=True)
+    has_premium = models.BooleanField(default=False, help_text="Premium users can add unlimited students")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -28,6 +29,21 @@ class User(AbstractUser):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
+    
+    @property
+    def current_student_count(self):
+        """Get the current number of active students for this teacher"""
+        if self.role != 'teacher':
+            return 0
+        return self.assigned_students.filter(is_active=True).count()
+    
+    def can_add_student(self):
+        """Check if teacher can add more students based on premium status"""
+        if self.role != 'teacher':
+            return False
+        if self.has_premium:
+            return True
+        return self.current_student_count < 3
 
 
 class UserPreferences(models.Model):

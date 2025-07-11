@@ -329,6 +329,22 @@ class ApiService {
     return this.api.post('/users/create_student/', studentData);
   }
 
+  // Get student limit information
+  async getStudentLimitInfo(): Promise<AxiosResponse<{
+    current_student_count: number;
+    student_limit: number | null;
+    has_premium: boolean;
+    can_add_student: boolean;
+    message: string;
+  }>> {
+    return this.api.get('/users/student_limit_info/');
+  }
+
+  // Change student password (for teachers)
+  async changeStudentPassword(studentId: number, newPassword: string): Promise<AxiosResponse<any>> {
+    return this.api.patch(`/users/${studentId}/`, { password: newPassword });
+  }
+
   // Enhanced student management
   async getStudentsWithProgress(): Promise<AxiosResponse<{
     students: Array<{

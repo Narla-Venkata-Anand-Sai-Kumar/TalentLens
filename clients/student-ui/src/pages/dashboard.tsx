@@ -60,13 +60,13 @@ const DashboardPage: React.FC = () => {
     <Layout>
       <div className="space-y-8 animate-fade-in">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-accent-600 to-accent-700 rounded-3xl p-8 text-white shadow-large">
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl p-8 text-white shadow-xl">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold mb-3">
                 Welcome back, {user?.first_name}! 👋
               </h1>
-              <p className="text-accent-100 text-lg">
+              <p className="text-emerald-100 text-lg">
                 {user?.role === 'student' 
                   ? "Ready to continue your interview preparation journey?"
                   : user?.role === 'teacher'
@@ -80,7 +80,7 @@ const DashboardPage: React.FC = () => {
                 variant="outline"
                 size="sm"
                 onClick={loadDashboardData}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-200 hover:scale-105"
                 disabled={loading}
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -407,29 +407,29 @@ interface StatsCardProps {
 
 const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, change, changeType, onClick }) => {
   const changeColors = {
-    positive: 'text-green-600',
-    negative: 'text-red-600',
-    neutral: 'text-gray-600',
+    positive: 'text-emerald-600 bg-emerald-100',
+    negative: 'text-red-600 bg-red-100',
+    neutral: 'text-gray-600 bg-gray-100',
   };
 
   return (
-    <Card className={onClick ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''} onClick={onClick}>
+    <Card className={`hover:shadow-xl transition-all duration-200 hover:scale-105 ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-600 mb-1">{title}</p>
-            <p className="text-2xl font-bold text-gray-900">{value}</p>
-            <p className={`text-sm ${changeColors[changeType]}`}>
-              {change} from last month
-            </p>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl">
+              {icon}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">{title}</p>
+              <p className="text-2xl font-bold text-gray-900">{value}</p>
+            </div>
           </div>
-          <div className="flex-shrink-0 flex items-center space-x-2">
-            {icon}
-            {onClick && (
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            )}
+          <div className={`px-2 py-1 rounded-full text-xs font-medium ${changeColors[changeType]}`}>
+            {changeType === 'positive' && '↗'}
+            {changeType === 'negative' && '↘'}
+            {changeType === 'neutral' && '→'}
+            {change}
           </div>
         </div>
       </CardContent>

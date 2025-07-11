@@ -72,6 +72,12 @@ const StudentModal: React.FC<StudentModalProps> = ({ isOpen, onClose, student, o
     phone_number: '',
     is_active: true,
   });
+  const [passwordData, setPasswordData] = useState({
+    new_password: '',
+    confirm_password: '',
+  });
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<{[key: string]: string}>({});
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
@@ -93,7 +99,34 @@ const StudentModal: React.FC<StudentModalProps> = ({ isOpen, onClose, student, o
         is_active: true,
       });
     }
+    
+    // Reset password fields
+    setPasswordData({
+      new_password: '',
+      confirm_password: '',
+    });
+    setShowPasswordSection(false);
+    setPasswordErrors({});
   }, [student]);
+
+  const validatePassword = () => {
+    const errors: {[key: string]: string} = {};
+    
+    if (!passwordData.new_password) {
+      errors.new_password = 'Password is required';
+    } else if (passwordData.new_password.length < 6) {
+      errors.new_password = 'Password must be at least 6 characters long';
+    }
+    
+    if (!passwordData.confirm_password) {
+      errors.confirm_password = 'Password confirmation is required';
+    } else if (passwordData.new_password !== passwordData.confirm_password) {
+      errors.confirm_password = 'Passwords do not match';
+    }
+    
+    setPasswordErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,8 +134,26 @@ const StudentModal: React.FC<StudentModalProps> = ({ isOpen, onClose, student, o
 
     try {
       if (student) {
+        // Update basic student info
         await apiService.updateUser(student.id, formData);
-        showToast('Student updated successfully', 'success');
+        
+        // Handle password change if requested
+        if (showPasswordSection) {
+          if (!validatePassword()) {
+            setLoading(false);
+            return;
+          }
+          
+          try {
+            await apiService.changeStudentPassword(student.id, passwordData.new_password);
+            showToast('Student and password updated successfully', 'success');
+          } catch (passwordError: any) {
+            const errorMessage = passwordError.response?.data?.error || 'Failed to change password';
+            showToast(`Student updated, but password change failed: ${errorMessage}`, 'warning');
+          }
+        } else {
+          showToast('Student updated successfully', 'success');
+        }
       } else {
         const newStudentData = {
           ...formData,
@@ -116,8 +167,18 @@ const StudentModal: React.FC<StudentModalProps> = ({ isOpen, onClose, student, o
       onClose();
     } catch (error: any) {
       console.error('Submit error:', error);
-      const errorMessage = error.response?.data?.message || `Failed to ${student ? 'update' : 'create'} student`;
-      showToast(errorMessage, 'error');
+      const errorData = error.response?.data;
+      
+      // Handle student limit error specifically
+      if (errorData?.error === 'Student limit reached') {
+        showToast(errorData.message, 'error');
+        if (!errorData.has_premium) {
+          showToast('Upgrade to Premium for unlimited students', 'info');
+        }
+      } else {
+        const errorMessage = errorData?.message || `Failed to ${student ? 'update' : 'create'} student`;
+        showToast(errorMessage, 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -191,6 +252,75 @@ const StudentModal: React.FC<StudentModalProps> = ({ isOpen, onClose, student, o
             Active Account
           </label>
         </div>
+
+        {/* Password Change Section for Existing Students */}
+        {student && (
+          <div className="border-t border-gray-200 pt-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-medium text-gray-900">Change Password</h3>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPasswordSection(!showPasswordSection)}
+              >
+                {showPasswordSection ? 'Cancel' : 'Change Password'}
+              </Button>
+            </div>
+            
+            {showPasswordSection && (
+              <div className="space-y-4 bg-gray-50 rounded-lg p-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    New Password *
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordData.new_password}
+                    onChange={(e) => {
+                      setPasswordData(prev => ({ ...prev, new_password: e.target.value }));
+                      setPasswordErrors(prev => ({ ...prev, new_password: '' }));
+                    }}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
+                      passwordErrors.new_password ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter new password"
+                  />
+                  {passwordErrors.new_password && (
+                    <p className="mt-1 text-sm text-red-600">{passwordErrors.new_password}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirm New Password *
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordData.confirm_password}
+                    onChange={(e) => {
+                      setPasswordData(prev => ({ ...prev, confirm_password: e.target.value }));
+                      setPasswordErrors(prev => ({ ...prev, confirm_password: '' }));
+                    }}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
+                      passwordErrors.confirm_password ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Confirm new password"
+                  />
+                  {passwordErrors.confirm_password && (
+                    <p className="mt-1 text-sm text-red-600">{passwordErrors.confirm_password}</p>
+                  )}
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-800">
+                    <strong>Password Requirements:</strong> At least 6 characters long
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {!student && (
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
@@ -1545,7 +1675,11 @@ const StudentsPage: React.FC = () => {
                           variant="primary"
                           size="sm"
                           onClick={() => handleScheduleInterview(student)}
+                          className="bg-blue-600 hover:bg-blue-700"
                         >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
                           Schedule Interview
                         </Button>
                         
@@ -1555,18 +1689,6 @@ const StudentsPage: React.FC = () => {
                           onClick={() => handleViewAnalytics(student)}
                         >
                           View Analytics
-                        </Button>
-                        
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => handleScheduleInterview(student)}
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          Schedule Interview
                         </Button>
                         
                         {(user?.role === 'administrator' || user?.role === 'teacher') && (
