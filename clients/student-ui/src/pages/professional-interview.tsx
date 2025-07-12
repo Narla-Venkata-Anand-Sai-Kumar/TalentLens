@@ -58,6 +58,10 @@ const ProfessionalInterview: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
+  // Audio recording refs
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // UI state
   const [showExitModal, setShowExitModal] = useState(false);
@@ -70,9 +74,8 @@ const ProfessionalInterview: React.FC = () => {
   
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
   const questionTimerRef = useRef<number | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   // Get session ID from URL
   useEffect(() => {
@@ -180,7 +183,11 @@ const ProfessionalInterview: React.FC = () => {
       // For professional interviews, we don't need to call startInterview
       // Questions are already generated dynamically
       
-      // Update session status locally
+      // Update session status in backend to allow answer submission
+      await apiService.updateProfessionalSession(sessionId!, {
+        status: 'in_progress',
+        started_at: new Date().toISOString()
+      });
       if (session) {
         session.status = 'in_progress';
       }
@@ -206,9 +213,92 @@ const ProfessionalInterview: React.FC = () => {
     }, 1000);
   };
 
+  // Toggle audio recording (voice-first answers)
+  const toggleAudioRecording = async () => {
+    if (isRecording) {
+      mediaRecorderRef.current?.stop();
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
+      setIsRecording(false);
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setAudioBlob(blob);
+
+        // Auto-transcribe so the answer can be submitted without typing
+        try {
+          const fd = new FormData();
+          fd.append('audio', blob, 'answer.webm');
+          const resp = await apiService.transcribeAudio(fd);
+          setCurrentAnswer(resp.text);
+          showToast('Audio transcribed. Review and edit if needed.', 'success');
+        } catch (err) {
+          console.error('Transcription failed', err);
+          showToast('Could not transcribe audio. You can type your answer.', 'error');
+        }
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingDuration(0);
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingDuration((d) => d + 1);
+      }, 1000);
+    } catch (err) {
+      console.error('Audio recording error', err);
+      showToast('Microphone permission denied', 'error');
+    }
+  };
+
+  // Play the recorded audio for review
+  const playAudio = () => {
+    if (!audioBlob) return;
+    const url = URL.createObjectURL(audioBlob);
+    if (audioRef.current) {
+      audioRef.current.src = url;
+      audioRef.current.play();
+    } else {
+      const audio = new Audio(url);
+      audio.play();
+    }
+  };
+
   // Submit current answer
   const submitAnswer = async () => {
-    if (!currentAnswer.trim() && !audioBlob) {
+    let answerText = currentAnswer;
+
+    // If no typed answer but we have audio, transcribe it on the fly
+    if (!answerText.trim() && audioBlob) {
+      try {
+        const fd = new FormData();
+        fd.append('audio', audioBlob, 'answer.webm');
+        const resp = await apiService.transcribeAudio(fd);
+        answerText = resp.text;
+        setCurrentAnswer(answerText);
+        showToast('Used transcribed audio as your answer', 'info');
+      } catch (err) {
+        console.error('Transcription failed', err);
+        showToast('Unable to transcribe audio. Please type your answer.', 'error');
+      }
+    }
+
+    if (!answerText.trim()) {
       showToast('Please provide an answer', 'warning');
       return;
     }
@@ -222,7 +312,7 @@ const ProfessionalInterview: React.FC = () => {
       // Update response
       const updatedResponse = {
         ...response,
-        answer: currentAnswer,
+        answer: answerText,
         audioBlob: audioBlob || undefined,
         timeSpent: questionTimeSpent,
         endTime: Date.now()
@@ -235,7 +325,7 @@ const ProfessionalInterview: React.FC = () => {
       // Submit to API
       await apiService.submitAnswer(sessionId!, {
         question_id: currentQuestion.id,
-        answer_text: currentAnswer,
+        answer_text: answerText,
         time_taken_seconds: questionTimeSpent
       });
       
@@ -334,6 +424,14 @@ const ProfessionalInterview: React.FC = () => {
     
     return () => clearInterval(timer);
   }, [phase, sessionTimeRemaining]);
+
+  // Ensure camera feed continues in interview phase
+  useEffect(() => {
+    if (phase === 'interview' && videoStream && videoRef.current) {
+      // @ts-ignore – srcObject is fine
+      videoRef.current.srcObject = videoStream;
+    }
+  }, [phase, videoStream]);
 
   // Security monitoring setup
   useEffect(() => {
@@ -777,7 +875,7 @@ const ProfessionalInterview: React.FC = () => {
                     
                     <Button
                       onClick={submitAnswer}
-                      disabled={isSubmitting || !currentAnswer.trim()}
+                      disabled={isSubmitting || (!currentAnswer.trim() && !audioBlob)}
                       className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
                     >
                       {isSubmitting ? 'Submitting...' : 
@@ -817,7 +915,7 @@ const ProfessionalInterview: React.FC = () => {
                     <Button
                       variant={isRecording ? 'danger' : 'outline'}
                       size="sm"
-                      onClick={() => {/* TODO: Implement audio recording */}}
+                      onClick={toggleAudioRecording}
                       className="flex-1"
                     >
                       {isRecording ? 'Stop Recording' : 'Start Recording'}
@@ -826,7 +924,7 @@ const ProfessionalInterview: React.FC = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {/* TODO: Implement audio playback */}}
+                        onClick={playAudio}
                       >
                         Play
                       </Button>

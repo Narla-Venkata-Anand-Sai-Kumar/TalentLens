@@ -216,14 +216,14 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             # Check if all questions are answered
             total_questions = session.questions.count()
             answered_questions = session.questions.filter(
-                interviewresponse__isnull=False
+                response__isnull=False
             ).distinct().count()
             
             # Get next question if available
             next_question = None
             if answered_questions < total_questions:
                 answered_question_ids = session.questions.filter(
-                    interviewresponse__isnull=False
+                    response__isnull=False
                 ).values_list('id', flat=True)
                 next_question_obj = session.questions.exclude(
                     id__in=answered_question_ids

@@ -295,6 +295,12 @@ class ApiService {
     return response.data;
   }
 
+  // Update professional interview session (e.g., to set status in_progress)
+  async updateProfessionalSession(sessionId: number, data: Partial<InterviewSession>): Promise<InterviewSession> {
+    const response = await this.api.patch(`/interviews/professional/${sessionId}/`, data);
+    return response.data;
+  }
+
   async getInterviewResults(sessionId: number): Promise<{
     session_id: number;
     status: string;
