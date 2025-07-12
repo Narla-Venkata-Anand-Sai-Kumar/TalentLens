@@ -429,3 +429,122 @@ class GeminiService:
         
         Keep practicing and you'll continue to improve!
         """
+    
+    def generate_dynamic_questions(self, interview_type: str, difficulty_level: str, 
+                                 question_count: int, time_available: int, 
+                                 student_profile: dict, session_context: dict) -> List[dict]:
+        """Generate dynamic questions with time allocations for professional interview"""
+        
+        prompt = f"""
+        You are an expert interview designer. Generate {question_count} interview questions based on these parameters:
+        
+        Interview Type: {interview_type}
+        Difficulty Level: {difficulty_level}
+        Total Time Available: {time_available} seconds
+        Student Profile: {json.dumps(student_profile, default=str)}
+        
+        Requirements:
+        1. Generate exactly {question_count} questions
+        2. Vary difficulty progressively (start easier, increase complexity)
+        3. Include realistic time estimates for each question
+        4. Provide evaluation criteria for each question
+        5. Ensure questions are relevant to {interview_type} interviews
+        
+        Return ONLY a valid JSON array with this exact structure:
+        [
+          {{
+            "text": "Your detailed question here",
+            "difficulty": "easy/medium/hard",
+            "category": "{interview_type}",
+            "time_limit": 300,
+            "expected_length": "short/medium/long",
+            "criteria": {{
+              "technical_accuracy": "Check for correct understanding",
+              "communication": "Evaluate clarity and structure",
+              "problem_solving": "Assess logical approach"
+            }}
+          }}
+        ]
+        """
+        
+        try:
+            response = self.model.generate_content(prompt)
+            response_text = response.text.strip()
+            
+            # Clean up response to ensure it's valid JSON
+            if response_text.startswith('```json'):
+                response_text = response_text[7:]
+            if response_text.endswith('```'):
+                response_text = response_text[:-3]
+            
+            questions_data = json.loads(response_text)
+            
+            # Validate and adjust time limits based on available time
+            total_allocated_time = sum(q.get('time_limit', 300) for q in questions_data)
+            if total_allocated_time > time_available:
+                # Adjust time limits proportionally
+                adjustment_factor = time_available / total_allocated_time
+                for question in questions_data:
+                    question['time_limit'] = max(120, int(question.get('time_limit', 300) * adjustment_factor))
+            
+            return questions_data
+            
+        except Exception as e:
+            logger.error(f"Error generating dynamic questions: {str(e)}")
+            # Return fallback questions
+            return self._get_fallback_dynamic_questions(interview_type, question_count, time_available)
+    
+    def _get_fallback_dynamic_questions(self, interview_type: str, count: int, time_available: int) -> List[dict]:
+        """Generate fallback questions when AI service fails"""
+        time_per_question = max(120, time_available // count)
+        
+        fallback_questions = {
+            'technical': [
+                "Explain the difference between synchronous and asynchronous programming.",
+                "How would you optimize a slow database query?",
+                "Describe the SOLID principles in software development.",
+                "What is the difference between REST and GraphQL?",
+                "How do you handle error handling in your applications?",
+                "Explain the concept of microservices architecture.",
+                "What are design patterns and give examples?",
+                "How do you ensure code quality in your projects?"
+            ],
+            'communication': [
+                "Tell me about a challenging project you worked on.",
+                "How do you handle conflicts in a team?",
+                "Describe your approach to learning new technologies.",
+                "How do you explain technical concepts to non-technical stakeholders?",
+                "Tell me about a time you had to meet a tight deadline.",
+                "How do you prioritize tasks when everything seems urgent?",
+                "Describe your ideal work environment.",
+                "How do you handle feedback and criticism?"
+            ],
+            'aptitude': [
+                "Solve this logic puzzle: If all roses are flowers and some flowers fade quickly, what can we conclude?",
+                "How would you approach solving a problem you've never encountered before?",
+                "Estimate how many ping pong balls would fit in a school bus.",
+                "What patterns do you see in this sequence: 2, 6, 12, 20, 30?",
+                "How would you test a pen?",
+                "If you could design a new app, what would it do?",
+                "Explain how you would organize a library.",
+                "What's the most creative solution you've come up with?"
+            ]
+        }
+        
+        questions = fallback_questions.get(interview_type, fallback_questions['technical'])[:count]
+        
+        return [
+            {
+                'text': question,
+                'difficulty': 'medium',
+                'category': interview_type,
+                'time_limit': time_per_question,
+                'expected_length': 'medium',
+                'criteria': {
+                    'clarity': 'Response should be clear and well-structured',
+                    'depth': 'Answer should demonstrate understanding',
+                    'relevance': 'Response should be relevant to the question'
+                }
+            }
+            for question in questions
+        ]

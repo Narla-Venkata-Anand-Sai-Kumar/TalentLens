@@ -85,11 +85,9 @@ const StudentModal: React.FC<StudentModalProps> = ({ isOpen, onClose, student, o
       } else {
         const newStudentData = {
           ...formData,
-          role: 'student' as const,
           password: 'TempPass123!',
-          password_confirm: 'TempPass123!',
         };
-        await apiService.register(newStudentData);
+        await apiService.createStudent(newStudentData);
         showToast('Student created successfully', 'success');
       }
       
@@ -97,8 +95,18 @@ const StudentModal: React.FC<StudentModalProps> = ({ isOpen, onClose, student, o
       onClose();
     } catch (error: any) {
       console.error('Submit error:', error);
-      const errorMessage = error.response?.data?.message || `Failed to ${student ? 'update' : 'create'} student`;
-      showToast(errorMessage, 'error');
+      const errorData = error.response?.data;
+      
+      // Handle student limit error specifically
+      if (errorData?.error === 'Student limit reached') {
+        showToast(errorData.message, 'error');
+        if (!errorData.has_premium) {
+          showToast('Upgrade to Premium for unlimited students', 'info');
+        }
+      } else {
+        const errorMessage = errorData?.message || `Failed to ${student ? 'update' : 'create'} student`;
+        showToast(errorMessage, 'error');
+      }
     } finally {
       setLoading(false);
     }

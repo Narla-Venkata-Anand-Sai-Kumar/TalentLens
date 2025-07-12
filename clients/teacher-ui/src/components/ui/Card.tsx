@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../utils/helpers';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'outlined';
@@ -8,10 +9,18 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', padding = 'md', children, ...props }, ref) => {
+    const { isDark } = useTheme();
+    
     const variants = {
-      default: 'bg-white border border-gray-200',
-      elevated: 'bg-white shadow-lg border border-gray-100',
-      outlined: 'bg-white border-2 border-gray-300',
+      default: isDark 
+        ? 'bg-gray-800 border border-gray-700' 
+        : 'bg-white border border-gray-200',
+      elevated: isDark 
+        ? 'bg-gray-800 shadow-lg border border-gray-600' 
+        : 'bg-white shadow-lg border border-gray-100',
+      outlined: isDark 
+        ? 'bg-gray-800 border-2 border-gray-600' 
+        : 'bg-white border-2 border-gray-300',
     };
 
     const paddings = {
@@ -57,13 +66,20 @@ CardHeader.displayName = 'CardHeader';
 interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, CardTitleProps>(
-  ({ className, ...props }, ref) => (
-    <h3
-      ref={ref}
-      className={cn('font-semibold leading-none tracking-tight text-lg', className)}
-      {...props}
-    />
-  )
+  ({ className, ...props }, ref) => {
+    const { isDark } = useTheme();
+    return (
+      <h3
+        ref={ref}
+        className={cn(
+          'font-semibold leading-none tracking-tight text-lg',
+          isDark ? 'text-gray-100' : 'text-gray-900',
+          className
+        )}
+        {...props}
+      />
+    );
+  }
 );
 
 CardTitle.displayName = 'CardTitle';
@@ -71,13 +87,20 @@ CardTitle.displayName = 'CardTitle';
 interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(
-  ({ className, ...props }, ref) => (
-    <p
-      ref={ref}
-      className={cn('text-sm text-gray-500', className)}
-      {...props}
-    />
-  )
+  ({ className, ...props }, ref) => {
+    const { isDark } = useTheme();
+    return (
+      <p
+        ref={ref}
+        className={cn(
+          'text-sm',
+          isDark ? 'text-gray-400' : 'text-gray-500',
+          className
+        )}
+        {...props}
+      />
+    );
+  }
 );
 
 CardDescription.displayName = 'CardDescription';

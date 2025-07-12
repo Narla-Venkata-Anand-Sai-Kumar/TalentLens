@@ -2,9 +2,13 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from apps.users.models import User
+import uuid
 
 class InterviewSession(models.Model):
     """Model for interview sessions"""
+    
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     INTERVIEW_TYPES = [
         ('technical', 'Technical'),
@@ -18,6 +22,7 @@ class InterviewSession(models.Model):
         ('completed', 'Completed'),
         ('missed', 'Missed'),
         ('cancelled', 'Cancelled'),
+        ('terminated', 'Terminated'),
     ]
     
     student = models.ForeignKey(
@@ -52,6 +57,31 @@ class InterviewSession(models.Model):
     security_violations = models.JSONField(default=list, blank=True)
     session_token = models.CharField(max_length=255, null=True, blank=True)
     is_session_valid = models.BooleanField(default=True)
+    
+    # Enhanced fields for professional interview
+    security_metadata = models.JSONField(default=dict, blank=True)
+    actual_duration = models.IntegerField(null=True, blank=True)  # Actual duration in minutes
+    time_limit = models.IntegerField(default=300)  # Time limit in seconds
+    category = models.CharField(max_length=50, blank=True)  # Additional category field
+    expected_answer_length = models.CharField(
+        max_length=20,
+        choices=[
+            ('short', 'Short (1-2 sentences)'),
+            ('medium', 'Medium (1-2 paragraphs)'),
+            ('long', 'Long (3+ paragraphs)')
+        ],
+        default='medium'
+    )
+    evaluation_criteria = models.JSONField(default=dict, blank=True)  # Criteria for evaluation
+    difficulty_level = models.CharField(
+        max_length=20, 
+        choices=[
+            ('easy', 'Easy'),
+            ('medium', 'Medium'), 
+            ('hard', 'Hard')
+        ],
+        default='medium'
+    )
     
     class Meta:
         db_table = 'interview_sessions'
@@ -101,6 +131,9 @@ class InterviewSession(models.Model):
 class InterviewQuestion(models.Model):
     """Model for interview questions"""
     
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    
     session = models.ForeignKey(
         InterviewSession, 
         on_delete=models.CASCADE, 
@@ -116,6 +149,21 @@ class InterviewQuestion(models.Model):
         default='medium'
     )
     
+    # Enhanced fields for professional interview
+    time_limit = models.IntegerField(default=300)  # Time limit in seconds
+    category = models.CharField(max_length=50, blank=True)  # Question category
+    expected_answer_length = models.CharField(
+        max_length=20,
+        choices=[
+            ('short', 'Short (1-2 sentences)'),
+            ('medium', 'Medium (1-2 paragraphs)'),
+            ('long', 'Long (3+ paragraphs)')
+        ],
+        default='medium'
+    )
+    evaluation_criteria = models.JSONField(default=dict, blank=True)  # Criteria for evaluation
+    order = models.IntegerField(default=0)  # Question order in session
+    
     class Meta:
         db_table = 'interview_questions'
         ordering = ['question_order']
@@ -126,6 +174,9 @@ class InterviewQuestion(models.Model):
 
 class InterviewResponse(models.Model):
     """Model for interview responses"""
+    
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     question = models.OneToOneField(
         InterviewQuestion, 
@@ -144,6 +195,12 @@ class InterviewResponse(models.Model):
     clarity_score = models.IntegerField(null=True, blank=True)
     example_score = models.IntegerField(null=True, blank=True)
     
+    # Enhanced fields for professional interview responses
+    audio_recording_url = models.URLField(blank=True)  # URL to audio recording
+    transcription_confidence = models.FloatField(null=True, blank=True)  # Transcription confidence score
+    evaluation_details = models.JSONField(default=dict, blank=True)  # Detailed evaluation
+    response_quality_score = models.IntegerField(null=True, blank=True)  # Quality score out of 100
+    
     class Meta:
         db_table = 'interview_responses'
     
@@ -152,6 +209,9 @@ class InterviewResponse(models.Model):
 
 class InterviewFeedback(models.Model):
     """Model for overall interview feedback"""
+    
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     session = models.OneToOneField(
         InterviewSession,
@@ -178,6 +238,9 @@ class InterviewFeedback(models.Model):
 
 class InterviewAnalytics(models.Model):
     """Model for storing interview analytics"""
+    
+    # Use UUID as primary key for better security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     session = models.OneToOneField(
         InterviewSession,

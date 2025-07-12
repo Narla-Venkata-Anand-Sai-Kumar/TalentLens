@@ -1,8 +1,12 @@
 from django.db import models
+import uuid
 from apps.users.models import User
 
 class Notification(models.Model):
     """Model for system notifications"""
+    
+    # Keep integer ID for compatibility, add UUID for security
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     NOTIFICATION_TYPES = [
         ('interview_scheduled', 'Interview Scheduled'),
@@ -72,6 +76,9 @@ class Notification(models.Model):
 class NotificationPreference(models.Model):
     """Model for user notification preferences"""
     
+    # Default id field (auto-incrementing primary key)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -102,6 +109,9 @@ class NotificationPreference(models.Model):
 
 class NotificationTemplate(models.Model):
     """Model for notification templates"""
+    
+    # Default id field (auto-incrementing primary key)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     
     name = models.CharField(max_length=100, unique=True)
     notification_type = models.CharField(max_length=30, choices=Notification.NOTIFICATION_TYPES)

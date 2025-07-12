@@ -57,7 +57,12 @@ const TestPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-medium text-gray-500">Status:</span>
-                  <span className="text-sm text-green-600 font-medium">✓ Running</span>
+                  <span className="text-sm text-green-600 font-medium flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Running
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-medium text-gray-500">Port:</span>
@@ -82,13 +87,28 @@ const TestPage: React.FC = () => {
                   <span className="text-sm font-medium text-gray-500">Django Backend:</span>
                   <div className="flex items-center">
                     {apiStatus === 'loading' && (
-                      <span className="text-sm text-yellow-600 font-medium">🔄 Testing...</span>
+                      <span className="text-sm text-yellow-600 font-medium flex items-center">
+                        <svg className="w-4 h-4 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Testing...
+                      </span>
                     )}
                     {apiStatus === 'success' && (
-                      <span className="text-sm text-green-600 font-medium">✓ Connected</span>
+                      <span className="text-sm text-green-600 font-medium flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Connected
+                      </span>
                     )}
                     {apiStatus === 'error' && (
-                      <span className="text-sm text-red-600 font-medium">✗ Error</span>
+                      <span className="text-sm text-red-600 font-medium flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Error
+                      </span>
                     )}
                   </div>
                 </div>
@@ -177,10 +197,20 @@ const TestPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm font-medium text-gray-500">Features Fixed:</span>
-                  <span className="text-sm text-green-600">✓ Link Components</span>
+                  <span className="text-sm text-green-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Link Components
+                  </span>
                 </div>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <p className="text-sm text-green-800 font-medium">✓ System Status: Operational</p>
+                  <p className="text-sm text-green-800 font-medium flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    System Status: Operational
+                  </p>
                   <p className="text-xs text-green-600 mt-1">All major components are running correctly</p>
                 </div>
               </div>

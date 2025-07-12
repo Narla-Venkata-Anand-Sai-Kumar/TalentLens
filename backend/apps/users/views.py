@@ -2,8 +2,8 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import User, TeacherStudentMapping
-from .serializers import UserSerializer, TeacherStudentMappingSerializer, StudentListSerializer
+from .models import User, TeacherStudentMapping, UserPreferences
+from .serializers import UserSerializer, TeacherStudentMappingSerializer, StudentListSerializer, UserPreferencesSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     """ViewSet for managing users"""
@@ -34,7 +34,47 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         return super().create(request, *args, **kwargs)
-    
+
+    @action(detail=False, methods=['get', 'put'])
+    def preferences(self, request):
+        """Get or update user preferences"""
+        user = request.user
+        
+        if request.method == 'GET':
+            # Get or create preferences for the user
+            preferences = UserPreferences.get_or_create_for_user(user)
+            serializer = UserPreferencesSerializer(preferences)
+            return Response(serializer.data)
+        
+        elif request.method == 'PUT':
+            # Update user preferences
+            preferences = UserPreferences.get_or_create_for_user(user)
+            serializer = UserPreferencesSerializer(preferences, data=request.data, partial=True)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['patch'])
+    def theme(self, request):
+        """Update only the theme preference"""
+        user = request.user
+        theme = request.data.get('theme')
+        
+        if theme not in ['light', 'dark', 'auto']:
+            return Response(
+                {'error': 'Invalid theme. Must be light, dark, or auto.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        preferences = UserPreferences.get_or_create_for_user(user)
+        preferences.theme = theme
+        preferences.save()
+        
+        return Response({'theme': preferences.theme})
+
     @action(detail=False, methods=['get'])
     def students(self, request):
         """Get list of students for teachers and administrators"""
@@ -68,6 +108,24 @@ class UserViewSet(viewsets.ModelViewSet):
         teachers = User.objects.filter(role='teacher').order_by('first_name', 'last_name', 'username')
         serializer = StudentListSerializer(teachers, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def student_limit_info(self, request):
+        """Get student limit information for teachers"""
+        if request.user.role != 'teacher':
+            return Response(
+                {'error': 'Only teachers can view student limit information'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        user = request.user
+        return Response({
+            'current_student_count': user.current_student_count,
+            'student_limit': 3 if not user.has_premium else None,
+            'has_premium': user.has_premium,
+            'can_add_student': user.can_add_student(),
+            'message': 'Premium account - unlimited students' if user.has_premium else f'Free account - {user.current_student_count}/3 students used'
+        })
 
     @action(detail=False, methods=['post'])
     def create_student(self, request):
@@ -75,6 +133,20 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.user.role != 'teacher':
             return Response(
                 {'error': 'Only teachers can create student accounts'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Check if teacher can add more students (premium feature flag)
+        if not request.user.can_add_student():
+            current_count = request.user.current_student_count
+            return Response(
+                {
+                    'error': 'Student limit reached', 
+                    'message': f'You currently have {current_count} students. Free accounts are limited to 3 students. Upgrade to Premium to add unlimited students.',
+                    'current_student_count': current_count,
+                    'student_limit': 3,
+                    'has_premium': request.user.has_premium
+                }, 
                 status=status.HTTP_403_FORBIDDEN
             )
         

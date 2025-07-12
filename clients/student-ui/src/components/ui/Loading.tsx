@@ -22,11 +22,14 @@ const Loading: React.FC<LoadingProps> = ({
     lg: { spinner: 'w-12 h-12', dots: 'w-4 h-4', text: 'text-lg' },
   };
 
+  // Ensure size exists in sizes object, fallback to 'md'
+  const currentSize = sizes[size] ? size : 'md';
+
   const renderSpinner = () => (
     <svg
       className={cn(
         'animate-spin text-blue-600',
-        sizes[size].spinner
+        sizes[currentSize].spinner
       )}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -55,7 +58,7 @@ const Loading: React.FC<LoadingProps> = ({
           key={index}
           className={cn(
             'bg-blue-600 rounded-full animate-pulse',
-            sizes[size].dots
+            sizes[currentSize].dots
           )}
           style={{
             animationDelay: `${index * 0.2}s`,
@@ -91,7 +94,7 @@ const Loading: React.FC<LoadingProps> = ({
     <div className={cn('flex flex-col items-center justify-center space-y-3', className)}>
       {renderLoadingElement()}
       {text && (
-        <p className={cn('text-gray-600', sizes[size].text)}>
+        <p className={cn('text-gray-600', sizes[currentSize].text)}>
           {text}
         </p>
       )}

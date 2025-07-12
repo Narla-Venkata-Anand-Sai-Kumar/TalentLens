@@ -1,14 +1,10 @@
+
 from .base import *
 
 DEBUG = True
 
-# Development database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# Use PostgreSQL database from base settings (don't override with SQLite)
+# DATABASES configuration is inherited from base.py
 
 # Development CORS settings
 CORS_ALLOW_ALL_ORIGINS = True

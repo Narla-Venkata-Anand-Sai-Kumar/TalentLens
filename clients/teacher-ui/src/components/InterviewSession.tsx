@@ -66,43 +66,61 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
   const initializeSession = async () => {
     try {
       setLoading(true);
+      
+      // First get the interview session details
       const sessionResponse = await apiService.getInterview(sessionId);
       const sessionData = sessionResponse.data;
       
       setSession(sessionData);
       
-      // If questions exist, use them; otherwise generate new ones
-      if (sessionData.questions && sessionData.questions.length > 0) {
+      // Check if interview is already in progress and has questions
+      if (sessionData.status === 'in_progress' && sessionData.questions && sessionData.questions.length > 0) {
         setQuestions(sessionData.questions);
         initializeResponses(sessionData.questions);
-      } else {
-        await generateQuestions(sessionData);
+        return;
       }
       
-      // Start the interview session
-      await apiService.startInterview(sessionId);
+      // If interview hasn't started yet, try to start it
+      if (sessionData.status === 'scheduled') {
+        try {
+          const startResponse = await apiService.startInterview(sessionId);
+          
+          // Get the questions from the start response
+          if (startResponse.data.questions && startResponse.data.questions.length > 0) {
+            setQuestions(startResponse.data.questions);
+            initializeResponses(startResponse.data.questions);
+          } else {
+            throw new Error('No questions generated');
+          }
+        } catch (startError: any) {
+          // Handle specific error cases
+          const errorMessage = startError.response?.data?.error || startError.message;
+          
+          if (errorMessage.includes('resume')) {
+            showToast('A resume is required to start this interview. Please upload your resume first.', 'error');
+          } else if (errorMessage.includes('Access denied')) {
+            showToast('You are not authorized to start this interview.', 'error');
+          } else if (errorMessage.includes('not accessible')) {
+            showToast('This interview is not currently accessible. Please check the scheduled time.', 'error');
+          } else {
+            showToast(errorMessage, 'error');
+          }
+          
+          throw startError;
+        }
+      } else {
+        throw new Error(`Interview is in ${sessionData.status} state and cannot be started`);
+      }
       
-    } catch (error) {
-      console.error('Error initializing session:', error);
-      showToast('Failed to initialize interview session', 'error');
+    } catch (error: any) {
+      console.error('Error starting interview:', error);
+      
+      if (!error.response) {
+        // Network or other error that wasn't handled above
+        showToast('Failed to connect to the server. Please check your internet connection.', 'error');
+      }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const generateQuestions = async (sessionData: InterviewSession) => {
-    try {
-      const response = await apiService.generateQuestions(sessionId, {
-        num_questions: sessionData.total_questions || 5,
-        difficulty_level: sessionData.difficulty_level || 'intermediate',
-        category: sessionData.category || 'general'
-      });
-      
-      setQuestions(response.data.questions);
-      initializeResponses(response.data.questions);
-    } catch (error) {
-      console.error('Error generating questions:', error);
-      showToast('Failed to generate questions', 'error');
     }
   };
 
@@ -179,9 +197,10 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
     
     // Submit the answer
     try {
-      await apiService.submitAnswer(currentQuestion.id, {
+      await apiService.submitAnswer(sessionId, {
+        question_id: currentQuestion.id,
         answer_text: currentAnswer,
-        time_taken: timeSpent
+        time_taken_seconds: timeSpent
       });
     } catch (error) {
       console.error('Error submitting answer:', error);
@@ -249,7 +268,7 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <Loading />
       </div>
     );
@@ -257,9 +276,9 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
 
   if (!session || questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <Card className="text-center p-8">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Interview Not Available</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Interview Not Available</h3>
           <p className="text-gray-500 mb-4">Unable to load interview session</p>
           <Button onClick={() => router.push('/interviews')}>
             Back to Interviews
@@ -273,13 +292,13 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">{session.title}</h1>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{session.title}</h1>
               <p className="text-sm text-gray-500">
                 Question {currentQuestionIndex + 1} of {questions.length}
               </p>
@@ -288,7 +307,7 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
             <div className="flex items-center space-x-4">
               {timeRemaining > 0 && (
                 <div className={`text-lg font-bold ${
-                  timeRemaining < 300 ? 'text-red-600' : 'text-gray-900'
+                  timeRemaining < 300 ? 'text-red-600' : 'text-gray-900 dark:text-gray-100'
                 }`}>
                   {formatTime(timeRemaining)}
                 </div>
@@ -324,7 +343,7 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
             <Card>
               <Card.Header>
                 <div className="flex justify-between items-start">
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     Question {currentQuestionIndex + 1}
                   </h2>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -339,13 +358,13 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
               
               <Card.Content className="space-y-6">
                 <div className="prose max-w-none">
-                  <p className="text-gray-900 text-lg leading-relaxed">
+                  <p className="text-gray-900 dark:text-gray-100 text-lg leading-relaxed">
                     {currentQuestion.question_text}
                   </p>
                 </div>
 
                 {/* Audio Recording */}
-                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <Button
                     variant={isRecording ? 'danger' : 'primary'}
                     onClick={isRecording ? stopRecording : startRecording}
@@ -353,7 +372,7 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
                   >
                     {isRecording ? (
                       <>
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse mr-2" />
+                        <div className="w-2 h-2 bg-white dark:bg-gray-300 rounded-full animate-pulse mr-2" />
                         Stop Recording
                       </>
                     ) : (
@@ -422,7 +441,7 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
             {/* Question Overview */}
             <Card>
               <Card.Header>
-                <h3 className="text-lg font-semibold text-gray-900">Overview</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Overview</h3>
               </Card.Header>
               <Card.Content>
                 <div className="space-y-3">
@@ -452,7 +471,7 @@ const InterviewSessionComponent: React.FC<InterviewSessionProps> = ({
             {/* Session Info */}
             <Card>
               <Card.Header>
-                <h3 className="text-lg font-semibold text-gray-900">Session Info</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Session Info</h3>
               </Card.Header>
               <Card.Content>
                 <div className="space-y-3 text-sm">

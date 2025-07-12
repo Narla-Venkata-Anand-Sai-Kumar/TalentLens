@@ -56,69 +56,153 @@ const InterviewsPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Interviews</h1>
-            <p className="text-gray-600">
-              {user?.role === 'student' 
-                ? 'Practice and track your interview sessions'
-                : 'Manage and conduct interview sessions'
-              }
-            </p>
+        <div className="relative bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-2xl p-8 text-white overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 to-teal-600/90 backdrop-blur-sm"></div>
+          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10 flex justify-between items-center">
+            <div className="flex-1">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">
+                    Professional Interviews
+                  </h1>
+                  <p className="text-emerald-100 text-lg">
+                    {user?.role === 'student' 
+                      ? 'Practice and track your professional interview sessions with advanced monitoring'
+                      : 'Manage and conduct professional interview sessions with comprehensive evaluation'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {(user?.role === 'teacher' || user?.role === 'administrator') && (
+              <Button 
+                variant="gradient"
+                onClick={() => setShowCreateModal(true)}
+                className="bg-white text-emerald-600 hover:bg-white/90 font-semibold shadow-lg transition-all duration-200 hover:scale-105"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Create Interview
+              </Button>
+            )}
           </div>
-          {(user?.role === 'teacher' || user?.role === 'administrator') && (
-            <Button onClick={() => setShowCreateModal(true)}>
-              Create Interview
-            </Button>
-          )}
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <StatsCard
-            title="Total Interviews"
-            value={interviews.length}
-            icon="📋"
-            color="emerald"
-          />
-          <StatsCard
-            title="Completed"
-            value={interviews.filter(i => i.status === 'completed').length}
-            icon="✅"
-            color="green"
-          />
-          <StatsCard
-            title="In Progress"
-            value={interviews.filter(i => i.status === 'in_progress').length}
-            icon="⏳"
-            color="yellow"
-          />
-          <StatsCard
-            title="Pending"
-            value={interviews.filter(i => i.status === 'pending').length}
-            icon="⏰"
-            color="gray"
-          />
+          <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Interviews</p>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                    {interviews.length}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Completed</p>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                    {interviews.filter(i => i.status === 'completed').length}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">In Progress</p>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                    {interviews.filter(i => i.status === 'in_progress').length}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-r from-gray-500 to-slate-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Pending</p>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-gray-600 to-slate-600 bg-clip-text text-transparent">
+                    {interviews.filter(i => i.status === 'pending').length}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-2">
-          {['all', 'pending', 'in_progress', 'completed', 'cancelled'].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === status
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-            </button>
-          ))}
-        </div>
+        <Card variant="elevated" className="group hover:shadow-xl transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex flex-wrap gap-3">
+              {['all', 'pending', 'in_progress', 'completed', 'cancelled'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilter(status)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-105 ${
+                    filter === status
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
+                      : 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-600 hover:from-gray-200 hover:to-slate-200 border border-gray-200'
+                  }`}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Interviews List */}
         {filteredInterviews.length > 0 ? (
@@ -140,12 +224,12 @@ const InterviewsPage: React.FC = () => {
           </div>
         ) : (
           <EmptyState
-            title="No interviews found"
-            description="Get started by creating your first interview session."
+            title="No professional interviews found"
+            description="Get started by creating your first professional interview session with advanced monitoring and evaluation."
             action={
               (user?.role === 'teacher' || user?.role === 'administrator') ? (
                 <Button onClick={() => setShowCreateModal(true)}>
-                  Create Interview
+                  Create Professional Interview
                 </Button>
               ) : null
             }
@@ -156,7 +240,7 @@ const InterviewsPage: React.FC = () => {
         <Modal
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
-          title="Create New Interview"
+          title="Create New Professional Interview"
           size="lg"
         >
           <CreateInterviewForm
@@ -172,7 +256,7 @@ const InterviewsPage: React.FC = () => {
             setShowEditModal(false);
             setEditingInterview(null);
           }}
-          title="Edit Interview"
+          title="Edit Professional Interview"
           size="lg"
         >
           <CreateInterviewForm
@@ -204,7 +288,7 @@ const InterviewsPage: React.FC = () => {
 interface StatsCardProps {
   title: string;
   value: number;
-  icon: string;
+  icon: React.ReactNode;
   color: string;
 }
 
@@ -224,7 +308,7 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, color }) => {
             <p className="text-sm text-gray-600 mb-1">{title}</p>
             <p className="text-2xl font-bold text-gray-900">{value}</p>
           </div>
-          <div className={`text-2xl ${colorClasses[color as keyof typeof colorClasses]}`}>
+          <div className={`${colorClasses[color as keyof typeof colorClasses]}`}>
             {icon}
           </div>
         </div>
@@ -254,10 +338,10 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-lg">
-              {interview.title || `${interview.interview_type || 'General'} Interview with ${interview.student_name || 'Student'}`}
+              {interview.title || `Professional ${interview.interview_type || interview.category || 'Technical'} Interview with ${interview.student_name || 'Student'}`}
             </CardTitle>
             <CardDescription>
-              {interview.description || interview.instructions || 'No description available'}
+              {interview.description || interview.instructions || 'Professional interview with advanced monitoring and evaluation'}
             </CardDescription>
           </div>
           <div className="flex flex-col items-end space-y-2">
@@ -265,7 +349,11 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
               {interview.status?.replace('_', ' ').toUpperCase() || 'UNKNOWN'}
             </span>
             <span className={`px-2 py-1 text-xs rounded-full ${getDifficultyColor(interview.difficulty_level)}`}>
-              {interview.difficulty_level?.toUpperCase() || 'MEDIUM'}
+              {interview.difficulty_level === 'entry' ? 'ENTRY LEVEL' :
+               interview.difficulty_level === 'intermediate' ? 'MID-LEVEL' :
+               interview.difficulty_level === 'senior' ? 'SENIOR LEVEL' :
+               interview.difficulty_level === 'executive' ? 'EXECUTIVE' :
+               interview.difficulty_level?.toUpperCase() || 'MID-LEVEL'}
             </span>
           </div>
         </div>
@@ -274,7 +362,17 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
         <div className="space-y-3">
           <div className="flex justify-between text-sm text-gray-600">
             <span>Category: {interview.category || interview.interview_type || 'General'}</span>
+            <span className="flex items-center">
+              <svg className="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              Professional Mode
+            </span>
+          </div>
+          
+          <div className="flex justify-between text-sm text-gray-600">
             <span>AI Generated: {interview.is_ai_generated ? 'Yes' : 'No'}</span>
+            <span>Security: {interview.security_enabled || interview.is_secure_mode ? 'Enabled' : 'Disabled'}</span>
           </div>
           
           {(interview.scheduled_time || interview.scheduled_datetime) && (
@@ -327,9 +425,10 @@ const CreateInterviewForm: React.FC<CreateInterviewFormProps> = ({ interview, on
     is_ai_generated: interview?.is_ai_generated ?? true,
     security_enabled: interview?.security_enabled ?? interview?.is_secure_mode ?? true,
     scheduled_time: interview?.scheduled_time || interview?.scheduled_datetime || '',
-    interview_type: interview?.interview_type || 'technical',
+    interview_type: 'professional', // Always use professional interview type
     duration_minutes: interview?.duration_minutes || interview?.duration || 60,
     instructions: interview?.instructions || interview?.description || '',
+    is_secure_mode: true, // Always enable secure mode for professional interviews
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -348,32 +447,32 @@ const CreateInterviewForm: React.FC<CreateInterviewFormProps> = ({ interview, on
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Input
-        label="Interview Title"
+        label="Professional Interview Title"
         name="title"
         value={formData.title}
         onChange={handleChange}
         required
-        placeholder="Enter interview title"
+        placeholder="Enter professional interview title"
       />
       
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Description
+          Interview Description & Instructions
         </label>
         <textarea
           name="description"
           value={formData.description}
           onChange={handleChange}
-          rows={3}
+          rows={4}
           className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          placeholder="Enter interview description"
+          placeholder="Enter detailed instructions and context for this professional interview"
         />
       </div>
       
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category
+            Interview Category
           </label>
           <select
             name="category"
@@ -381,10 +480,12 @@ const CreateInterviewForm: React.FC<CreateInterviewFormProps> = ({ interview, on
             onChange={handleChange}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
-            <option value="technical">Technical</option>
-            <option value="behavioral">Behavioral</option>
-            <option value="situational">Situational</option>
-            <option value="coding">Coding</option>
+            <option value="technical">Technical Interview</option>
+            <option value="behavioral">Behavioral Interview</option>
+            <option value="situational">Situational Interview</option>
+            <option value="coding">Coding Interview</option>
+            <option value="system_design">System Design</option>
+            <option value="leadership">Leadership & Management</option>
           </select>
         </div>
         
@@ -398,52 +499,72 @@ const CreateInterviewForm: React.FC<CreateInterviewFormProps> = ({ interview, on
             onChange={handleChange}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
+            <option value="entry">Entry Level</option>
+            <option value="intermediate">Mid-Level</option>
+            <option value="senior">Senior Level</option>
+            <option value="executive">Executive Level</option>
           </select>
         </div>
       </div>
-      
-      <Input
-        label="Scheduled Time (Optional)"
-        name="scheduled_time"
-        type="datetime-local"
-        value={formData.scheduled_time}
-        onChange={handleChange}
-      />
-      
-      <div className="space-y-3">
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            name="is_ai_generated"
-            checked={formData.is_ai_generated}
-            onChange={handleChange}
-            className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
-          />
-          <label className="ml-2 text-sm text-gray-900">
-            Generate questions using AI
-          </label>
-        </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Input
+          label="Duration (minutes)"
+          name="duration_minutes"
+          type="number"
+          value={formData.duration_minutes}
+          onChange={handleChange}
+          min="15"
+          max="180"
+          placeholder="60"
+        />
         
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            name="security_enabled"
-            checked={formData.security_enabled}
-            onChange={handleChange}
-            className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
-          />
-          <label className="ml-2 text-sm text-gray-900">
-            Enable anti-cheating security
-          </label>
+        <Input
+          label="Scheduled Time (Optional)"
+          name="scheduled_time"
+          type="datetime-local"
+          value={formData.scheduled_time}
+          onChange={handleChange}
+        />
+      </div>
+      
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 className="text-sm font-medium text-blue-900 mb-3">Professional Interview Settings</h4>
+        <div className="space-y-3">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="is_ai_generated"
+              checked={formData.is_ai_generated}
+              onChange={handleChange}
+              className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+            />
+            <label className="ml-2 text-sm text-blue-900">
+              Generate questions using AI (Recommended)
+            </label>
+          </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="security_enabled"
+              checked={formData.security_enabled}
+              onChange={handleChange}
+              className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+            />
+            <label className="ml-2 text-sm text-blue-900">
+              Enable professional security mode (Proctoring, fullscreen, etc.)
+            </label>
+          </div>
         </div>
+        <p className="text-xs text-blue-700 mt-2">
+          Professional interviews include enhanced monitoring, secure environment, and comprehensive evaluation.
+        </p>
       </div>
       
       <div className="flex space-x-3 pt-4">
         <Button type="submit" fullWidth>
-          Create Interview
+          Create Professional Interview
         </Button>
         <Button type="button" variant="outline" fullWidth onClick={onCancel}>
           Cancel

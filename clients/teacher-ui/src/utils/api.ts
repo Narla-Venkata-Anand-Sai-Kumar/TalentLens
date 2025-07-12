@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { AuthTokens, User, InterviewSession, Resume, Notification, DashboardStats } from '../types';
+import { AuthTokens, User, InterviewSession, InterviewQuestion, Resume, Notification, DashboardStats } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -103,6 +103,27 @@ class ApiService {
     return this.api.patch('/auth/user/', data);
   }
 
+  async changePassword(data: {
+    old_password: string;
+    new_password: string;
+    new_password_confirm: string;
+  }): Promise<AxiosResponse<{ message: string }>> {
+    return this.api.post('/auth/change-password/', data);
+  }
+
+  // User Preferences APIs
+  async getUserPreferences(): Promise<AxiosResponse<any>> {
+    return this.api.get('/users/preferences/');
+  }
+
+  async updateUserPreferences(data: any): Promise<AxiosResponse<any>> {
+    return this.api.put('/users/preferences/', data);
+  }
+
+  async updateTheme(theme: 'light' | 'dark' | 'auto'): Promise<AxiosResponse<{ theme: string }>> {
+    return this.api.patch('/users/theme/', { theme });
+  }
+
   // Interview APIs
   async getInterviews(params?: {
     status?: string;
@@ -129,46 +150,62 @@ class ApiService {
   }
 
   async startInterview(id: number): Promise<AxiosResponse<InterviewSession>> {
-    return this.api.post(`/interviews/${id}/start/`);
+    return this.api.post(`/interviews/${id}/start_interview/`);
   }
 
   async completeInterview(id: number): Promise<AxiosResponse<InterviewSession>> {
-    return this.api.post(`/interviews/${id}/complete/`);
+    return this.api.post(`/interviews/${id}/complete_interview/`);
   }
 
-  async generateQuestions(id: number, data: {
-    num_questions: number;
-    difficulty_level: string;
-    category: string;
-  }): Promise<AxiosResponse<{ questions: any[] }>> {
-    return this.api.post(`/interviews/${id}/generate-questions/`, data);
-  }
-
-  async submitAnswer(questionId: number, data: {
+  async submitAnswer(sessionId: number, data: {
+    question_id: number;
     answer_text: string;
-    time_taken?: number;
+    time_taken_seconds?: number;
   }): Promise<AxiosResponse<any>> {
-    return this.api.post(`/interviews/questions/${questionId}/submit/`, data);
+    return this.api.post(`/interviews/${sessionId}/submit_answer/`, data);
   }
 
-  async scheduleInterview(interviewData: {
-    student: number;
-    scheduled_datetime: string;
-    end_datetime: string;
-    interview_type: 'technical' | 'communication' | 'aptitude';
-    duration_minutes: number;
-    instructions?: string;
-    is_secure_mode?: boolean;
-    session_id?: string;
-    security_config?: {
-      tab_switch_limit: number;
-      warning_limit: number;
-      time_extension_allowed: boolean;
-      copy_paste_disabled: boolean;
-      screen_recording_detection: boolean;
+  // Interview session management APIs
+  async validateInterviewSession(id: number): Promise<AxiosResponse<{
+    valid: boolean;
+    session_id: string;
+    security_config: any;
+    tab_switches: number;
+    warning_count: number;
+    time_remaining: number;
+  }>> {
+    return this.api.post(`/interviews/${id}/validate_session/`);
+  }
+
+  async reportSecurityEvent(id: number, data: {
+    event_type: string;
+    event_data?: any;
+  }): Promise<AxiosResponse<{
+    event_recorded: boolean;
+    session_invalidated: boolean;
+    tab_switches: number;
+    warning_count: number;
+    violations_remaining: {
+      tab_switches: number;
+      warnings: number;
     };
-  }): Promise<AxiosResponse<InterviewSession>> {
-    return this.api.post('/interviews/', interviewData);
+  }>> {
+    return this.api.post(`/interviews/${id}/report_security_event/`, data);
+  }
+
+  async invalidateInterviewSession(id: number): Promise<AxiosResponse<{
+    session_invalidated: boolean;
+    message: string;
+  }>> {
+    return this.api.post(`/interviews/${id}/invalidate_session/`);
+  }
+
+  async getInterviewResults(id: number): Promise<AxiosResponse<any>> {
+    return this.api.get(`/interviews/${id}/get_results/`);
+  }
+
+  async getInterviewResponses(id: number): Promise<AxiosResponse<any>> {
+    return this.api.get(`/interviews/${id}/responses/`);
   }
 
   // Resume APIs
@@ -280,6 +317,34 @@ class ApiService {
     return this.api.post('/users/', userData);
   }
 
+  // Create student account (for teachers)
+  async createStudent(studentData: {
+    email: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+    phone_number?: string;
+    is_active?: boolean;
+  }): Promise<AxiosResponse<User>> {
+    return this.api.post('/users/create_student/', studentData);
+  }
+
+  // Get student limit information
+  async getStudentLimitInfo(): Promise<AxiosResponse<{
+    current_student_count: number;
+    student_limit: number | null;
+    has_premium: boolean;
+    can_add_student: boolean;
+    message: string;
+  }>> {
+    return this.api.get('/users/student_limit_info/');
+  }
+
+  // Change student password (for teachers)
+  async changeStudentPassword(studentId: number, newPassword: string): Promise<AxiosResponse<any>> {
+    return this.api.patch(`/users/${studentId}/`, { password: newPassword });
+  }
+
   // Enhanced student management
   async getStudentsWithProgress(): Promise<AxiosResponse<{
     students: Array<{
@@ -379,6 +444,46 @@ class ApiService {
     }>;
   }>> {
     return this.api.get('/dashboard/analytics/', { params });
+  }
+
+  // Enhanced Interview APIs for Professional Sessions
+  async generateDynamicQuestions(params: {
+    session_id: number;
+    remaining_time: number;
+    interview_type: string;
+    difficulty_level: string;
+    student_profile: any;
+  }): Promise<AxiosResponse<{ questions: InterviewQuestion[] }>> {
+    return this.api.post('/interviews/generate-dynamic-questions/', params);
+  }
+
+  async transcribeAudio(audioBlob: Blob): Promise<AxiosResponse<{ text: string }>> {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.webm');
+    
+    return this.api.post('/interviews/transcribe-audio/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
+  // Use existing reportSecurityEvent method
+
+  async invalidateSession(sessionId: number, reason: string): Promise<AxiosResponse<void>> {
+    return this.api.post(`/interviews/${sessionId}/invalidate/`, { reason });
+  }
+
+  async validateSession(sessionId: number): Promise<AxiosResponse<{ valid: boolean; reason?: string }>> {
+    return this.api.get(`/interviews/${sessionId}/validate/`);
+  }
+
+  async getSessionResults(sessionId: number): Promise<AxiosResponse<any>> {
+    return this.api.get(`/interviews/${sessionId}/results/`);
+  }
+
+  async getSessionResponses(sessionId: number): Promise<AxiosResponse<any[]>> {
+    return this.api.get(`/interviews/${sessionId}/responses/`);
   }
 
   // Generic GET method

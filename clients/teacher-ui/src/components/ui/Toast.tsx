@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../../utils/helpers';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface Toast {
   id: string;
@@ -68,7 +69,7 @@ const ToastContainer: React.FC = () => {
   if (toasts.length === 0) return null;
 
   const toastContent = (
-    <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div className="fixed top-4 right-4 z-50 space-y-3 w-full max-w-sm sm:max-w-md pointer-events-none">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
       ))}
@@ -84,6 +85,7 @@ interface ToastItemProps {
 }
 
 const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
+  const { isDark } = useTheme();
   const icons = {
     success: (
       <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -133,22 +135,22 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
   return (
     <div
       className={cn(
-        'max-w-sm w-full shadow-lg rounded-lg pointer-events-auto border',
+        'w-full shadow-lg rounded-lg pointer-events-auto border',
         bgColors[toast.type],
         'animate-slide-in-right'
       )}
     >
       <div className="p-4">
-        <div className="flex items-start">
-          <div className="flex-shrink-0">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 mt-0.5">
             {icons[toast.type]}
           </div>
-          <div className="ml-3 w-0 flex-1">
-            <p className="text-sm font-medium text-gray-900">
+          <div className="flex-1 min-w-0 pr-2">
+            <p className={`text-sm font-medium break-words leading-relaxed ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
               {toast.title}
             </p>
             {toast.description && (
-              <p className="mt-1 text-sm text-gray-500">
+              <p className={`mt-1 text-sm break-words leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
                 {toast.description}
               </p>
             )}
@@ -156,20 +158,20 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onClose }) => {
               <div className="mt-3">
                 <button
                   onClick={toast.action.onClick}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-500"
+                  className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors"
                 >
                   {toast.action.label}
                 </button>
               </div>
             )}
           </div>
-          <div className="ml-4 flex-shrink-0 flex">
+          <div className="flex-shrink-0">
             <button
               onClick={onClose}
-              className="inline-flex text-gray-400 hover:text-gray-500"
+              className="inline-flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
             >
               <span className="sr-only">Close</span>
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"

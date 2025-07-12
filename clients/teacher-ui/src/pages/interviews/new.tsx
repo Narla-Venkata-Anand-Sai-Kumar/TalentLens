@@ -101,7 +101,7 @@ const NewInterviewPage: React.FC = () => {
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Create New Interview</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Create New Professional Interview</h1>
           <p className="mt-2 text-gray-600">
             Set up a new interview session with AI-generated questions
           </p>
@@ -295,7 +295,7 @@ const NewInterviewPage: React.FC = () => {
                   type="submit"
                   isLoading={loading}
                 >
-                  {user?.role === 'student' ? 'Start Interview' : 'Create Interview'}
+                  {user?.role === 'student' ? 'Start Professional Interview' : 'Create Professional Interview'}
                 </Button>
               </div>
             </form>

@@ -1,6 +1,7 @@
 // User and Authentication Types
 export interface User {
   id: number;
+  uuid?: string; // UUID field for enhanced security
   username?: string;
   email: string;
   first_name: string;
@@ -11,6 +12,7 @@ export interface User {
   phone_number?: string;
   profile_picture?: string;
   full_name?: string;
+  has_premium?: boolean;
   profile?: {
     bio?: string;
     phone_number?: string;

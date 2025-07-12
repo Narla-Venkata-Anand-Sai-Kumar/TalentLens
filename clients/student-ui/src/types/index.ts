@@ -1,6 +1,7 @@
 // User and Authentication Types
 export interface User {
   id: number;
+  uuid?: string; // UUID field for enhanced security
   username?: string;
   email: string;
   first_name: string;
@@ -48,7 +49,7 @@ export interface InterviewSession {
   category?: string;
   interview_type?: 'technical' | 'communication' | 'aptitude';
   difficulty_level?: 'beginner' | 'intermediate' | 'advanced';
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'pending' | 'missed';
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'pending' | 'missed' | 'terminated';
   student: number;
   teacher?: number;
   student_name?: string; // From API

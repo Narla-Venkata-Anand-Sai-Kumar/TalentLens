@@ -95,11 +95,17 @@ class TokenResponseSerializer(serializers.Serializer):
         user = obj.get('user')
         return {
             'id': user.id,
+            'uuid': str(user.uuid) if user.uuid else None,
             'username': user.username,
             'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
             'role': user.role,
             'full_name': user.full_name,
-            'profile_picture': user.profile_picture
+            'phone_number': user.phone_number,
+            'profile_picture': user.profile_picture,
+            'is_active': user.is_active,
+            'date_joined': user.date_joined.isoformat() if user.date_joined else None,
         }
 
 class ChangePasswordSerializer(serializers.Serializer):
