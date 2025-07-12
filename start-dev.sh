@@ -1,23 +1,27 @@
 #!/bin/bash
 
-# TalentLens Development Startup Script
-echo "🎯 Starting TalentLens Development Environment..."
+# TalentLens Development Startup Script (Legacy)
+# NOTE: This script is deprecated. Use ./start-development.sh instead.
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Function to check if port is in use
-check_port() {
-    if lsof -Pi :$1 -sTCP:LISTEN -t >/dev/null ; then
-        return 0
-    else
-        return 1
-    fi
-}
+echo "⚠️  This script is deprecated!"
+echo ""
+echo "Please use the new development script instead:"
+echo "  ./start-development.sh"
+echo ""
+echo "The new script provides:"
+echo "  - External PostgreSQL support"
+echo "  - Local UI applications (non-dockerized)"
+echo "  - Better error handling and logging"
+echo "  - Comprehensive status checks"
+echo ""
+read -p "Do you want to run the new script now? (Y/n): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
+    exec ./start-development.sh
+else
+    echo "Exiting. To use the new script later, run: ./start-development.sh"
+    exit 0
+fi
 
 # Check if required directories exist
 if [ ! -d "frontend" ] || [ ! -d "backend" ]; then

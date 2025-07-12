@@ -39,14 +39,14 @@ if ! command -v docker-compose &> /dev/null; then
     exit 1
 fi
 
-# Create environment file for backend
+# Create environment file from config template
 print_status "Setting up environment configuration..."
-if [ ! -f backend/.env ]; then
-    cp backend/.env.example backend/.env
-    print_success "Created backend/.env file. Please update it with your actual values."
-    print_warning "Don't forget to add your Gemini API key to backend/.env"
+if [ ! -f config/local.env ]; then
+    cp config/local.env.example config/local.env
+    print_success "Created config/local.env file. Please update it with your actual values."
+    print_warning "Don't forget to add your Gemini API key to config/local.env"
 else
-    print_warning "backend/.env already exists. Skipping creation."
+    print_warning "config/local.env already exists. Skipping creation."
 fi
 
 # Create frontend environment file
@@ -123,7 +123,7 @@ echo
 print_status "To stop all services:"
 echo "  docker-compose down"
 echo
-print_warning "Remember to update your Gemini API key in backend/.env before testing AI features!"
+print_warning "Remember to update your Gemini API key in config/local.env before testing AI features!"
 
 # Check if all services are running
 print_status "Checking service status..."

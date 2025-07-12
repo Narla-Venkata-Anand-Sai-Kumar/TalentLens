@@ -1,21 +1,4 @@
 services:
-  postgres:
-    image: postgres:13
-    container_name: talentlens_postgres
-    environment:
-      POSTGRES_DB: talentlens_dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   redis:
     image: redis:6-alpine
     container_name: talentlens_redis
@@ -41,77 +24,21 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
+      - ./config/local.env
     environment:
       - DEBUG=True
-      - DB_HOST=postgres
       - REDIS_URL=redis://redis:6379/0
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/admin/"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  student-ui:
-    build:
-      context: ./clients/student-ui
-      dockerfile: Dockerfile
-    container_name: talentlens_student_ui
-    volumes:
-      - ./clients/student-ui:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-      - NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws
-    depends_on:
-      - backend
-    command: npm run dev
-
-  teacher-ui:
-    build:
-      context: ./clients/teacher-ui
-      dockerfile: Dockerfile
-    container_name: talentlens_teacher_ui
-    volumes:
-      - ./clients/teacher-ui:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "3001:3001"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-      - NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws
-    depends_on:
-      - backend
-    command: npm run dev
-
-  admin-ui:
-    build:
-      context: ./clients/admin-ui
-      dockerfile: Dockerfile
-    container_name: talentlens_admin_ui
-    volumes:
-      - ./clients/admin-ui:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "3002:3002"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-      - NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws
-    depends_on:
-      - backend
-    command: npm run dev
-
 volumes:
-  postgres_data:
   redis_data:
   media_volume:
