@@ -24,7 +24,7 @@ export REDIS_PORT="6379"
 export REDIS_DB="0"
 
 # AI Configuration
-export GEMINI_API_KEY="AIzaSyAq0qgl9ksdQ9xBZdfNcdDyU2bZ9JtG17M"
+export GEMINI_API_KEY=None
 
 # Email Configuration
 export EMAIL_HOST="smtp.gmail.com"
