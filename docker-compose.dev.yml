@@ -1,21 +1,4 @@
 services:
-  postgres:
-    image: postgres:13
-    container_name: talentlens_postgres_dev
-    environment:
-      POSTGRES_DB: talentlens_dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data_dev:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   redis:
     image: redis:6-alpine
     container_name: talentlens_redis_dev
@@ -41,18 +24,14 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
+      - ./config/local.env
     environment:
       - DEBUG=True
-      - DB_HOST=postgres
       - REDIS_URL=redis://redis:6379/0
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_healthy
 
 volumes:
-  postgres_data_dev:
   redis_data_dev:
   media_volume_dev:

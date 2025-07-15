@@ -1,93 +1,77 @@
-# 🎯 TalentLens
+# TalentLens - AI-Powered Talent Assessment Platform
 
-**Professional AI-Powered Interview Training Platform**
-
-A comprehensive, market-ready interview training system that leverages AI to provide personalized interview experiences, real-time feedback, and detailed analytics for students, teachers, and administrators.
-
-## 🌟 Features
-
-### 🎓 For Students
-
-- **AI-Generated Interviews**: Personalized technical, communication, and aptitude questions based on resume analysis
-- **Real-time Feedback**: Instant scoring and detailed feedback using Google Gemini AI
-- **Secure Interview Environment**: Anti-cheating measures with tab switching detection and fullscreen mode
-- **Progress Tracking**: Comprehensive analytics and performance trends
-- **Resume Management**: Upload and AI analysis of resumes with improvement suggestions
-
-### 👨‍🏫 For Teachers
-
-- **Student Management**: Assign and monitor multiple students
-- **Interview Scheduling**: Create and manage interview sessions
-- **Analytics Dashboard**: Track student progress and performance
-- **Resume Review**: Access student resumes and AI analysis
-
-### 🔧 For Administrators
-
-- **System Overview**: Comprehensive analytics and metrics
-- **User Management**: Manage teachers, students, and assignments
-- **Performance Analytics**: System-wide statistics and trends
-
-## 🏗️ Architecture
-
-### Backend (Django REST API)
-
-- **Framework**: Django 4.2 with Django REST Framework
-- **Database**: PostgreSQL with optimized queries
-- **AI Integration**: Google Gemini API for question generation and scoring
-- **Authentication**: JWT-based with role-based access control
-- **Background Tasks**: Celery with Redis
-
-### Frontend (Multi-Client Architecture)
-
-- **Framework**: Next.js 14 with TypeScript
-- **Architecture**: Separate clients for Student, Teacher, and Admin portals
-- **Styling**: Tailwind CSS with custom themes per client
-- **State Management**: React Context with custom hooks
-
-### Infrastructure
-
-- **Containerization**: Docker and Docker Compose
-- **Database**: PostgreSQL 13 with connection pooling
-- **Cache/Queue**: Redis for caching and task queue
+TalentLens is a comprehensive platform for conducting AI-powered interviews and talent assessments. It provides separate interfaces for students, teachers, and administrators with advanced AI integration for interview analysis and skill evaluation.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Docker and Docker Compose
-- Git
-- Google Gemini API key
+- PostgreSQL (v13+)
+- Node.js (v18+)
+- Docker & Docker Compose
+- Python (v3.8+)
 
-### 1. Clone the Repository
+### Installation
 
-```bash
-git clone <repository-url>
-cd TalentLens
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd TalentLens
+   ```
+
+2. **Run the setup script**
+
+   ```bash
+   chmod +x setup.sh
+   ./setup.sh
+   ```
+
+3. **Start the development environment**
+
+   ```bash
+   ./start.sh
+   ```
+
+4. **Run database migrations**
+
+   ```bash
+   cd backend
+   python manage.py migrate
+   python manage.py createsuperuser
+   ```
+
+5. **Access the applications**
+   - **Student UI**: http://localhost:3000
+   - **Teacher UI**: http://localhost:3001
+   - **Admin UI**: http://localhost:3002
+   - **API**: http://localhost:8000
+   - **Admin Panel**: http://localhost:8000/admin/
+
+## 🏗️ Architecture
+
+### Components
+
+- **Backend**: Django REST API with AI integration
+- **Database**: PostgreSQL (external)
+- **Cache**: Redis (Docker)
+- **Frontend**: Next.js applications (local)
+
+### Services
+
 ```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   PostgreSQL    │    │      Redis      │    │  Django Backend │
+│   (External)    │    │    (Docker)     │    │    (Docker)     │
+│   Port: 5432    │    │   Port: 6379    │    │   Port: 8000    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
 
-### 2. Run Setup Script
-
-```bash
-./setup.sh
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Student UI    │    │   Teacher UI    │    │    Admin UI     │
+│    (Local)      │    │    (Local)      │    │    (Local)      │
+│   Port: 3000    │    │   Port: 3001    │    │   Port: 3002    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
-
-### 3. Access the Applications
-
-- **Student Portal**: http://localhost:3001 (Blue theme)
-- **Teacher Portal**: http://localhost:3002 (Green theme)
-- **Admin Dashboard**: http://localhost:3003 (Purple theme)
-- **Backend API**: http://localhost:8000/api
-
-### 4. Configure Gemini AI
-
-1. Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Add it to `backend/.env`:
-
-```env
-GEMINI_API_KEY=your_api_key_here
-```
-
-3. Restart: `docker-compose restart backend`
 
 ## 📁 Project Structure
 
@@ -95,153 +79,226 @@ GEMINI_API_KEY=your_api_key_here
 TalentLens/
 ├── backend/                 # Django REST API
 │   ├── apps/               # Django applications
-│   ├── talentlens/         # Django settings
-│   └── requirements.txt    # Python dependencies
-├── clients/                # Next.js applications
-│   ├── shared/             # Shared components & utilities
-│   ├── student-ui/         # Student portal (Blue theme)
-│   ├── teacher-ui/         # Teacher portal (Green theme)
-│   └── admin-ui/           # Admin dashboard (Purple theme)
-├── docs/                   # Documentation
-│   ├── README.md           # Documentation index
-│   ├── ARCHITECTURE.md     # System architecture
-│   ├── DEPLOYMENT.md       # Deployment guide
-│   └── development/        # Development docs
-├── scripts/                # Setup and utility scripts
-└── docker-compose.yml      # Development environment
+│   │   ├── authentication/ # User authentication
+│   │   ├── interviews/     # Interview management
+│   │   ├── dashboard/      # Dashboard data
+│   │   ├── users/          # User management
+│   │   └── ai_engine/      # AI integration
+│   └── manage.py
+├── clients/                # Frontend applications
+│   ├── student-ui/         # Student interface
+│   ├── teacher-ui/         # Teacher interface
+│   └── admin-ui/           # Admin interface
+├── config/                 # Configuration files
+│   ├── local.env           # Local environment variables
+│   └── local.env.example   # Environment template
+├── requirements/           # Python dependencies
+│   ├── backend.txt         # Production dependencies
+│   ├── dev.txt            # Development dependencies
+│   └── prod.txt           # Production-only dependencies
+├── docker-compose.yml      # Docker services
+├── setup.sh               # Main setup script
+├── start.sh               # Start development environment
+└── stop.sh                # Stop development environment
 ```
 
-## 🔧 Development
+## ⚙️ Configuration
 
-### Backend Development
+### Environment Variables
+
+The main configuration is stored in `config/local.env`. Key variables:
+
+- **Database**: `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`
+- **API Keys**: `GEMINI_API_KEY`
+- **Ports**: `STUDENT_UI_PORT`, `TEACHER_UI_PORT`, `ADMIN_UI_PORT`
+- **URLs**: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WS_URL`
+
+### Customization
+
+1. Copy the example configuration:
+
+   ```bash
+   cp config/local.env.example config/local.env
+   ```
+
+2. Edit `config/local.env` with your settings
+
+3. Restart the environment:
+   ```bash
+   ./stop.sh && ./start.sh
+   ```
+
+## 🛠️ Development
+
+### Available Commands
 
 ```bash
-# Enter backend container
-docker-compose exec backend bash
+# Environment management
+./setup.sh                 # Initial setup
+./start.sh                 # Start all services
+./stop.sh                  # Stop all services
 
-# Run migrations
-python manage.py migrate
+# Backend management
+cd backend
+python manage.py migrate   # Run database migrations
+python manage.py createsuperuser  # Create admin user
+python manage.py shell     # Django shell
 
-# Create superuser
-python manage.py createsuperuser
+# Database access
+psql -h localhost -U postgres -d talentlens_dev
 
-# Run tests
-python manage.py test
+# Logs
+docker-compose logs -f backend     # Backend logs
+tail -f clients/logs/*.log         # UI application logs
 ```
 
-### Frontend Development
+### Development Workflow
 
-```bash
-# Install dependencies for all clients
-cd clients && npm install
+1. **Start the environment**
 
-# Start individual clients
-npm run dev:student   # Student portal on :3001
-npm run dev:teacher   # Teacher portal on :3002
-npm run dev:admin     # Admin dashboard on :3003
-```
+   ```bash
+   ./start.sh
+   ```
 
-### Database Management
+2. **Make changes**
 
-```bash
-# Access PostgreSQL
-docker-compose exec postgres psql -U postgres -d talentlens_dev
+   - Backend changes: Auto-reload with Django
+   - Frontend changes: Auto-reload with Next.js
 
-# Backup database
-docker-compose exec postgres pg_dump -U postgres talentlens_dev > backup.sql
+3. **Database changes**
 
-# Restore database
-docker-compose exec -T postgres psql -U postgres talentlens_dev < backup.sql
-```
+   ```bash
+   cd backend
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
 
-## 🔐 Security Features
+4. **Stop when done**
+   ```bash
+   ./stop.sh
+   ```
 
-- JWT-based authentication with refresh tokens
-- Role-based access control (Admin, Teacher, Student)
-- Fullscreen mode enforcement during interviews
-- Tab switching detection and warnings
-- Input sanitization and SQL injection prevention
+## 🎯 Features
 
-## 🧪 Testing
+### Student Interface
 
-### Backend Tests
+- Take AI-powered interviews
+- View interview results and feedback
+- Track progress and performance
+- Access learning resources
 
-```bash
-docker-compose exec backend python manage.py test
-```
+### Teacher Interface
 
-### Frontend Tests
+- Create and manage interview questions
+- Review student interviews
+- Generate detailed reports
+- Monitor class performance
 
-```bash
-cd clients && npm test
-```
+### Admin Interface
+
+- Manage users and permissions
+- Configure system settings
+- View analytics and insights
+- Manage AI configurations
+
+### Backend API
+
+- RESTful API with JWT authentication
+- WebSocket support for real-time features
+- AI integration with Google Gemini
+- File upload and processing
+- Background task processing
+
+## 🔒 Security
+
+- JWT-based authentication
+- CORS protection
+- Environment-based configuration
+- Secure file uploads
+- Input validation and sanitization
 
 ## 🚀 Deployment
 
-### Production Environment
+### Production Setup
 
-```env
-SECRET_KEY=your-production-secret-key
-DEBUG=False
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
-DATABASE_URL=postgresql://user:password@host:port/dbname
-GEMINI_API_KEY=your_gemini_api_key
-```
+1. **Configure production environment**
 
-### Docker Production Build
+   ```bash
+   cp config/local.env.example config/production.env
+   # Edit production.env with production values
+   ```
 
-```bash
-docker-compose -f docker-compose.prod.yml up -d
-```
+2. **Install production dependencies**
 
-## 🆘 Support
+   ```bash
+   pip install -r requirements/backend.txt -r requirements/prod.txt
+   ```
+
+3. **Build frontend applications**
+
+   ```bash
+   cd clients/student-ui && npm run build
+   cd ../teacher-ui && npm run build
+   cd ../admin-ui && npm run build
+   ```
+
+4. **Configure web server** (Nginx, Apache, etc.)
+
+5. **Set up process management** (systemd, PM2, etc.)
+
+## 🆘 Troubleshooting
 
 ### Common Issues
 
-**Backend not starting:**
+**Port conflicts**
 
-- Check PostgreSQL: `docker-compose ps postgres`
-- Verify environment variables in `backend/.env`
-- Check logs: `docker-compose logs backend`
+```bash
+# Check what's using a port
+lsof -i :3000
+# Kill the process
+kill -9 <PID>
+```
 
-**Frontend build errors:**
+**Database connection errors**
 
-- Clear node modules: `rm -rf clients/*/node_modules && cd clients && npm install`
-- Check Node.js version (requires 18+)
+```bash
+# Check PostgreSQL status
+sudo systemctl status postgresql
+# Restart PostgreSQL
+sudo systemctl restart postgresql
+```
+
+**Docker issues**
+
+```bash
+# Restart Docker services
+docker-compose down && docker-compose up
+# Clean Docker cache
+docker system prune
+```
+
+**Node.js dependency issues**
+
+```bash
+# Clear npm cache
+npm cache clean --force
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+```
 
 ### Getting Help
 
-- Check comprehensive documentation in [`/docs`](./docs/) folder
-- Browse: [Architecture](./docs/ARCHITECTURE.md), [Deployment](./docs/DEPLOYMENT.md), [Development](./docs/development/)
-- Create GitHub issues for bugs or questions
+1. Check the logs for error messages
+2. Verify all prerequisites are installed
+3. Ensure all ports are available
+4. Review the configuration files
+5. Check the troubleshooting section above
 
-## 🗺️ Roadmap
+## 📄 License
 
-### Phase 1 (Current)
-
-- ✅ Core interview system
-- ✅ AI integration with Gemini
-- ✅ User management and authentication
-- ✅ Multi-client UI architecture
-
-### Phase 2 (Planned)
-
-- 🔄 Advanced analytics and insights
-- 🔄 Video interview integration
-- 🔄 Mobile app development
-
-### Phase 3 (Future)
-
-- 📋 Multi-language support
-- 📋 Enterprise features and SSO
-- 📋 Integration with job boards
-
-## 📝 License
-
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
-**Built with ❤️ for better interview preparation**
-
-_TalentLens - Empowering students, teachers, and organizations with AI-powered interview training._
+**Happy coding!** 🚀

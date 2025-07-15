@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'neroskilltrainer.wsgi.application'
 ASGI_APPLICATION = 'neroskilltrainer.asgi.application'
 
 # Database
-DATABASE_URL = config('DATABASE_URL', default='postgresql://postgres:password@localhost:5432/talentlens')
+DATABASE_URL = config('DATABASE_URL', default='postgresql://postgres:password@localhost:5433/talentlens_dev')
 DATABASES = {
     'default': dj_database_url.parse(DATABASE_URL)
 }
